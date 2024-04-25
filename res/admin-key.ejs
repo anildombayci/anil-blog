@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Admin | Anıl Blog</title>
+
+        <meta charset="UTF-8">
+
+        <link href="https://fonts.googleapis.com/icon?family=Poppins" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/font-awesome-line-awesome/css/all.min.css" integrity="sha512-dC0G5HMA6hLr/E1TM623RN6qK+sL8sz5vB+Uc68J7cBon68bMfKcvbkg6OqlfGHo1nMmcCxO5AinnRTDhWbWsA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css" integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    <body>
+        <!-- START NAV -->
+        <nav class="navbar columns is-fixed-top" role="navigation" aria-label="main navigation" id="app-header">
+    <div class="navbar-brand column is-2 is-paddingless">
+        <a class="navbar-item" href="/">
+            ANIL BLOG
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="touchMenu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="touchMenu">
+        <a class="navbar-item" href="/admin">
+            <span class="icon">
+                <i class="fa fa-home"></i>
+            </span> Ana Menü
+        </a>
+        <a class="navbar-item" href="/postlar">
+            <span class="icon">
+                <i class="fa fa-edit"></i>
+            </span> Postlar
+        </a>
+        <a class="navbar-item is-active" href="/api/keygen">
+            <span class="icon">
+                <i class="fa fa-desktop"></i>
+            </span> Key Oluştur
+        </a>
+        <a class="navbar-item " href="#">
+            <span class="icon">
+                <i class="fa fa-table"></i>
+            </span> Key Listesi
+        </a>
+    </div>
+
+    <div id="navMenu" class="navbar-menu column is-hidden-touch">
+        <div class="navbar-end">
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    &nbsp; <%- user.username.replace("admin", "Anıl Bey") %>
+                </a>
+                <div class="navbar-dropdown">
+                    <a class="navbar-item app-logout" href="/logout">
+                        Çıkış Yap
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+        <!-- END NAV -->
+
+        <div class="columns" id="app-content">
+            <div class="column is-2 is-fullheight is-hidden-touch" id="sidebar">
+    <aside class="menu">
+        <p class="menu-label is-hidden-touch">
+            BLOG
+        </p>
+        <ul class="menu-list">
+            <li>
+                <a class="" href="/admin">
+                    <span class="icon">
+                        <i class="fa fa-home"></i>
+                    </span> Ana Menü
+                </a>
+            </li>
+            <li>
+                <a class="" href="/postlar">
+                    <span class="icon">
+                        <i class="fa fa-desktop"></i>
+                    </span> Postlar
+                </a>
+            </li>
+            <li>
+                <a class="" href="/postyayinla">
+                    <span class="icon">
+                        <i class="fa fa-edit"></i>
+                    </span> Post yayınla
+                </a>
+            </li>
+            <li>
+                <a class="" href="/postkaldir">
+                    <span class="icon">
+                        <i class="fa fa-eraser"></i>
+                    </span> Post kaldır
+                </a>
+            </li>
+        </ul>
+        <p class="menu-label is-hidden-touch">
+            API
+        </p>
+        <ul class="menu-list">
+            <li>
+                <a class="is-active" href="/api/keygen">
+                    <span class="icon">
+                        <i class="fa fa-edit"></i>
+                    </span> Key oluştur
+                </a>
+            </li>
+            <li>
+                <a class="" href="/api/keyliste">
+                    <span class="icon">
+                        <i class="fa fa-desktop"></i>
+                    </span> Key listele
+                </a>
+            </li>
+      </ul>
+        <p class="menu-label is-hidden-touch">
+            LINK YONLENDIRME
+        </p>
+        <ul class="menu-list">
+            <li>
+                <a class="" href="/link/ekle">
+                    <span class="icon">
+                        <i class="fa fa-edit"></i>
+                    </span> Link Oluştur
+                </a>
+            </li>
+            <li>
+                <a class="" href="/link/listele">
+                    <span class="icon">
+                        <i class="fa fa-desktop"></i>
+                    </span> Link Listele
+                </a>
+            </li>
+      </ul>
+</div>
+
+            <div class="column is-10" id="page-content">
+                    <div class="content-header">
+        <h4 class="title is-4">Key Oluştur</h4>
+        <span class="separator"></span>
+        <nav class="breadcrumb has-bullet-separator" aria-label="breadcrumbs">
+            <ul>
+                <li><a href="/admin">Admin Panel</a></li>
+                <li><a style="color: black">API</a></li>
+                <li class="is-active"><a href="/api/keygen" aria-current="page">Key oluştur</a></li>
+            </ul>
+        </nav>
+    </div>  
+<div class="notification is-info is-light">
+  Bu sayfada <strong>sadece senin yapabileceğin</strong> sitenin API Key'lerini oluşturacaksın <strong>geçerli olacak tarihi sen belirleyeceksin</strong> ve daha sonrasında çıkan API keyini güle güle kullan.
+</div>
+<form action="/api/keygen" method="post">
+    <div class="field">
+        <label class="label">API Key Sahibi:</label>
+        <div class="control">
+            <input class="input is-rounded" type="text" name="owner" placeholder="API Key Sahibinin Adı">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Anahtar Geçerlilik Süresi:</label>
+        <div class="control">
+            <div class="select is-rounded">
+                <select name="expiry">
+                    <option value="1">1 gün</option>
+                    <option value="5">5 gün</option>
+                    <option value="7">1 hafta</option>
+                    <option value="35">5 hafta</option>
+                    <option value="365">1 yıl</option>
+                    <option value="unlimited">Sınırsız</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">Key Yetkisi:</label>
+        <div class="control">
+            <div class="select is-rounded">
+                <select name="yetki">
+                    <option value="okuma">Okuma</option>
+                    <option value="yayinlama">Yayınlama</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="field">
+        <div class="control">
+            <button type="submit" class="button is-danger is-rounded">Anahtar Oluştur</button>
+        </div>
+    </div>
+</form>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Form gönderildiğinde
+  document.getElementById("keygen-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Formun varsayılan davranışını engelle
+    var form = event.target;
+    var formData = new FormData(form);
+
+    // Sunucuya POST isteği gönder
+    fetch("/api/keygen", {
+      method: "POST",
+      body: formData
+    })
+    .then(response => response.text()) // Sunucudan gelen yanıtı metin olarak al
+    .then(data => {
+      // Kullanıcıya anahtarın görüntülendiği bir bildirim göster
+      alert("API anahtarınız:\n\n" + data);
+      form.reset(); // Formu sıfırla
+    })
+    .catch(error => {
+      console.error("Anahtar oluşturma hatası:", error);
+      alert("API anahtarı oluşturulamadı. Lütfen daha sonra tekrar deneyin.");
+    });
+  });
+});
+</script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js" integrity="sha512-3PRVLmoBYuBDbCEojg5qdmd9UhkPiyoczSFYjnLhFb2KAFsWWEMlAPt0olX1Nv7zGhDfhGEVkXsu51a55nlYmw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js" integrity="sha512-ZwR1/gSZM3ai6vCdI+LVF1zSq/5HznD3ZSTk7kajkaj4D292NLuduDCO1c/NT8Id+jE58KYLKT7hXnbtryGmMg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function() {
+            let bar = {
+                type: 'bar',
+                height: 40,
+                barWidth: 4,
+                barColor: '#fff',
+                barSpacing: 3
+            };
+
+            let line = {
+                type: 'line',
+                width: 150,//73
+                height: 36,
+                lineColor: '#fff',
+                fillColor: 'rgba(0,0,0,0)',
+                lineWidth: 2,
+                maxSpotColor: 'rgba(255,255,255,0.4)',
+                minSpotColor: 'rgba(255,255,255,0.4)',
+                spotColor: 'rgba(255,255,255,0.4)',
+                spotRadius: 3,
+                highlightSpotColor: '#fff',
+                highlightLineColor: 'rgba(255,255,255,0.4)'
+            };
+            // $(item).find('.sparkline-bar-stats').sparkline('html', chart === 'bar' ? bar : line);
+
+            function data(length = 22) {
+                return Array.from({length}, () => Math.floor(Math.random() * 40));
+            }
+
+            $('.inlinesparkline-bar').each(function() {
+                $(this).sparkline(data(), bar);
+            });
+
+            $('.inlinesparkline-line').each(function() {
+                $(this).sparkline(data(), line);
+            });
+
+            var ctx1 = document.getElementById('chart2').getContext('2d');
+            window.myBar = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    "labels": ["January", "February", "March", "April", "May", "June", "July"],
+                    "datasets": [{
+                        "label": "Dataset 1",
+                        "backgroundColor": "rgb(255, 99, 132)",
+                        "stack": "Stack 0",
+                        "data": data(8)
+                    }, {
+                        "label": "Dataset 2",
+                        "backgroundColor": "rgb(54, 162, 235)",
+                        "stack": "Stack 0",
+                        "data": data(8)
+                    }, {
+                        "label": "Dataset 3",
+                        "backgroundColor": "rgb(75, 192, 192)",
+                        "stack": "Stack 1",
+                        "data": data(8)
+                    }]
+                },
+                options: {
+                    title: {
+                        display: false,
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                }
+            });
+
+            var ctx2 = document.getElementById('chart1').getContext('2d');
+            window.myLine = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
+                    datasets: [{
+                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        data: data(8),
+                        label: 'Dataset',
+                        fill: 'start'
+                    }]
+                },
+                options: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: false
+                    },
+                }
+            });
+        });
+    </script>
+
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-4TVE6RNN41"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-4TVE6RNN41');
+        </script>
+
+        <script type=application/ld+json>{"@context":"http://schema.org","@type":"WebSite","url":"https://www.nafplann.com/","name":"Abdul Manaaf | Fullstack Web Developer","author":"Abdul Manaaf","image":"https://avatars3.githubusercontent.com/u/7114259?s=460&v=4","description":"Abdul Manaaf is a Fullstack Web Developer from Indonesia","sameAs":["https://www.facebook.com/nafplann","https://instagram.com/nafplann","https://twitter.com/nafplann","https://id.linkedin.com/in/nafplann","https://github.com/nafplann"]}</script>
+
+        <script type=application/ld+json>{"@context":"http://schema.org","@type":"Person","email":"mailto:nafplann@gmail.com","image":"https://avatars3.githubusercontent.com/u/7114259?s=460&v=4","jobTitle":"Fullstack Web Developer","name":"Abdul Manaaf","url":"https://www.nafplann.com/","sameAs":["https://www.facebook.com/nafplann","https://instagram.com/nafplann","https://twitter.com/nafplann","https://id.linkedin.com/in/nafplann","https://github.com/nafplann"]}</script>
+
+        <script type=application/ld+json>{
+            "@context":"http://schema.org",
+            "@type":"BreadcrumbList",
+            "itemListElement":[
+               {
+                  "@type":"ListItem",
+                  "position":1,
+                  "item":{
+                     "@id":"https://nafplann.com/",
+                     "name":"Home",
+                     "image":"https://avatars3.githubusercontent.com/u/7114259?s=460&v=4"
+                  }
+               },
+               {
+                  "@type":"ListItem",
+                  "position":2,
+                  "item":{
+                     "@id":"https://nafplann.com/bulma-admin/",
+                     "name":"free-bulma-admin-dashboard-template",
+                     "image":"https://avatars3.githubusercontent.com/u/7114259?s=460&v=4"
+                  }
+               }
+            ]
+         }</script>
+    </body>
+
+<!-- Mirrored from bulma-admin.test/ by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 18 Feb 2024 10:20:26 GMT -->
+</html>
+
+<script>
+const getAll = (selector) => {
+    return document.querySelectorAll(selector);
+};
+
+window.onload = function() {
+    // Check for click events on the navbar burger icon
+    var $navbarBurger = getAll('.navbar-burger');
+    var $touchMenu = document.getElementById('touchMenu');
+
+    if ($navbarBurger.length > 0) {
+        $navbarBurger.forEach(function ($el) {
+            $el.addEventListener("click", function (event) {
+                event.stopPropagation();
+                $el.classList.toggle("is-active");
+                $touchMenu.classList.toggle("is-active");
+            });
+        });
+    }
+
+    // Dropdowns
+    var $dropdowns = getAll(".dropdown:not(.is-hoverable)");
+
+    if ($dropdowns.length > 0) {
+        $dropdowns.forEach(function ($el) {
+            $el.addEventListener("click", function (event) {
+                event.stopPropagation();
+                $el.classList.toggle("is-active");
+            });
+        });
+
+        document.addEventListener("click", function (event) {
+            closeDropdowns();
+        });
+    }
+
+    function closeDropdowns() {
+        $dropdowns.forEach(function ($el) {
+            $el.classList.remove("is-active");
+        });
+    }
+
+    const logout = getAll('.app-logout');
+
+    logout.forEach(function ($el) {
+        $el.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Your session will be ended!",
+                icon: "warning",
+                showCancelButton: true,
+                // confirmButtonColor: "#3085d6",
+                // cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, log me out!"
+            }).then((result) => {
+
+            });
+        });
+    });
+
+    const sidebarMenus = getAll('#sidebar ul li a');
+
+    sidebarMenus.forEach(function($el) {
+        $el.addEventListener('click', function() {
+            const nextSibling = $el.nextElementSibling;
+
+            if (!nextSibling) return;
+
+            if (nextSibling.classList.contains('submenu')) {
+                nextSibling.classList.toggle('is-block');
+            }
+        })
+    });
+}
+</script>
+
+<style>
+nav .navbar-dropdown {
+    border-top: none;
+}
+
+#notification-dropdown {
+    min-width: 16rem;
+}
+
+#sidebar {
+    padding: 0;
+    background: #292C3A;
+}
+
+#sidebar .menu {
+    font-size: .9rem;
+}
+
+#sidebar p.menu-label {
+    color: #868aa8;
+    padding: 0px 40px;
+    margin-top: 20px;
+}
+
+#sidebar li a, #touchMenu a {
+    color: #868aa8;
+    padding: 9px 40px;
+}
+
+#sidebar li a .icon {
+    color: #525672;
+}
+
+#sidebar li a.is-active, #touchMenu a.is-active {
+    color: #8D68AB;
+    background-color: transparent;
+}
+
+#sidebar a.is-active .icon {
+    color: #868aa8;
+}
+
+#sidebar a:hover {
+    transition: background-color .3s;
+    background-color: #2C2F3D;
+}
+
+#sidebar a:hover .icon {
+    color: #868aa8;
+}
+
+#sidebar .menu-list li ul {
+    border-left: none;
+    margin-top: 0;
+    margin-left: 1rem;
+}
+
+#sidebar .submenu {
+    display: none;
+}
+
+#sidebar li a.is-active + .submenu {
+    display: block;
+    opacity: 1;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+    font-family: Poppins;
+}
+
+.table th {
+    border: 1px solid #f4f5f8;
+}
+
+.table.is-bordered tr:last-child th {
+    border-bottom-width: 2px;
+    border-top-width: 2px;
+}
+
+.table td {
+    border: 1px solid #f4f5f8;
+}
+
+.input,
+.textarea,
+.select select {
+    border-color: #ebedf2;
+}
+
+.button,
+.input,
+.textarea,
+.select select,
+.file-cta,
+.file-name,
+.pagination-previous,
+.pagination-next,
+.pagination-link,
+.pagination-ellipsis {
+    /* height: 3em;
+    min-width: 3em; */
+}
+
+.control.has-icons-right .input,
+.control.has-icons-right .select select {
+    padding-right: 2.25em;
+}
+
+.file.is-fullwidth .file-name {
+    display: flex;
+}
+
+.breadcrumb {
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+#app-header .navbar-brand {
+    background: #282a3c;
+}
+
+.navbar-burger {
+    cursor: pointer;
+    height: 4.25rem;
+    position: relative;
+    width: 4.25rem;
+    margin-left: auto;
+}
+
+.navbar-brand,
+.navbar-tabs {
+    -webkit-box-align: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-negative: 0;
+    flex-shrink: 0;
+    min-height: 4.25rem;
+}
+
+.is-paddingless {
+    padding: 0 !important;
+}
+
+.card {
+    background-color: white;
+    -webkit-box-shadow: 0 1px 15px 1px rgba(69, 65, 78, 0.08) !important;
+    box-shadow: 0 1px 15px 1px rgba(69, 65, 78, 0.08) !important;
+    color: #4a4a4a;
+    max-width: 100%;
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.box {
+    border-radius: 0px;
+    -webkit-box-shadow: 0 1px 15px 1px rgba(69, 65, 78, 0.08) !important;
+    box-shadow: 0 1px 15px 1px rgba(69, 65, 78, 0.08) !important;
+}
+
+.box.quick-stats {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    border-bottom-width: 3px;
+    border-bottom-color: rgba(0, 0, 0, 0.3);
+    border-bottom-style: solid;
+}
+
+.quick-stats-icon {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.quick-stats-content {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.quick-stats-content .title {
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.title,
+.subtitle {
+    word-break: break-word;
+}
+
+.title em,
+.title span,
+.subtitle em,
+.subtitle span {
+    font-weight: inherit;
+}
+
+.title sub,
+.subtitle sub {
+    font-size: 0.75em;
+}
+
+.title sup,
+.subtitle sup {
+    font-size: 0.75em;
+}
+
+.title .tag,
+.subtitle .tag {
+    vertical-align: middle;
+}
+
+.title {
+    color: #363636;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.125;
+}
+
+.title strong {
+    color: inherit;
+    font-weight: inherit;
+}
+
+.title+.highlight {
+    margin-top: -0.75rem;
+}
+
+.title:not(.is-spaced)+.subtitle {
+    margin-top: -1.25rem;
+}
+
+.title.is-1 {
+    font-size: 2.5rem;
+}
+
+.title.is-2 {
+    font-size: 2rem;
+}
+
+.title.is-3 {
+    font-size: 1.5rem;
+}
+
+.title.is-4 {
+    font-size: 1.2rem;
+}
+
+.title.is-5 {
+    font-size: 1rem;
+}
+
+.title.is-6 {
+    font-size: 0.9rem;
+}
+
+.title.is-7 {
+    font-size: 0.65rem;
+}
+
+.subtitle {
+    color: #4a4a4a;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+}
+
+.subtitle strong {
+    color: #363636;
+    font-weight: 600;
+}
+
+.subtitle:not(.is-spaced)+.title {
+    margin-top: -1.25rem;
+}
+
+.subtitle.is-1 {
+    font-size: 2.5rem;
+}
+
+.subtitle.is-2 {
+    font-size: 2rem;
+}
+
+.subtitle.is-3 {
+    font-size: 1.5rem;
+}
+
+.subtitle.is-4 {
+    font-size: 1.2rem;
+}
+
+.subtitle.is-5 {
+    font-size: 1rem;
+}
+
+.subtitle.is-6 {
+    font-size: 0.9rem;
+}
+
+.subtitle.is-7 {
+    font-size: 0.65rem;
+}
+
+.heading {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    font-size: .9rem;
+}
+
+nav.navbar {
+    border-top: 4px solid #8D68AB;
+    -webkit-box-shadow: 0 1px 15px 1px rgba(69, 65, 78, .1);
+    box-shadow: 0 1px 15px 1px rgba(69, 65, 78, .1);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+#login .hero.is-success {
+    background: #F2F6FA;
+}
+
+#login .hero .nav,
+#login .hero.is-success .nav {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+#login .box {
+    margin-top: 5rem;
+}
+
+#login .avatar {
+    margin-top: -70px;
+    padding-bottom: 20px;
+}
+
+#login .avatar img {
+    padding: 5px;
+    background: #fff;
+    border-radius: 50%;
+    -webkit-box-shadow: 0 2px 3px rgba(10, 10, 10, .1), 0 0 0 1px rgba(10, 10, 10, .1);
+    box-shadow: 0 2px 3px rgba(10, 10, 10, .1), 0 0 0 1px rgba(10, 10, 10, .1);
+}
+
+#login input {
+    font-weight: 300;
+}
+
+#login p {
+    font-weight: 700;
+}
+
+#login p.subtitle {
+    padding-top: 1rem;
+}
+
+#login .interactive-bg {
+    height: 100vh;
+    background-color: #8D68AB;
+    -webkit-box-shadow: inset 24px 4px 64px -24px rgba(71, 71, 71, 1);
+    -moz-box-shadow: inset 24px 4px 64px -24px rgba(71, 71, 71, 1);
+    box-shadow: inset 24px 4px 64px -24px rgba(71, 71, 71, 1);
+}
+
+@media (max-width: 769px) {
+    #login .interactive-bg {
+        display: none
+    }
+}
+
+#login .button {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    min-width: 150px;
+}
+
+#login .login-logo {
+    margin: 0 auto;
+    margin-bottom: 50px;
+    max-height: 100px;
+}
+
+#login .columns {
+    margin: 0px;
+}
+
+#app-header {
+    margin: 0;
+}
+
+#app-header .navbar-brand {
+    background: #282a3c;
+}
+
+#app-header .navbar-brand .navbar-item:first-child {
+    padding: 0 40px;
+    text-transform: bold;
+    color: #C7C8D2;
+    font-weight: bold;
+    font-size: 1.2rem;
+    height: 100%;
+}
+
+
+
+#touchMenu {
+    display: none;
+    height: calc(100vh - 4.4rem);
+    overflow: auto;
+}
+
+#touchMenu.is-active {
+    display: block;
+}
+
+#touchMenu .menu-list a {
+    border-radius: 0px;
+    padding: 1em 2.4em;
+}
+
+#app-content {
+    background: #F2F3F8;
+    margin: 0;
+    padding-top: 5rem;
+    min-height: 100vh;
+}
+
+#page-content {
+    padding: 2rem;
+}
+
+#page-content .content-header {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+#page-content .content-header .title {
+    margin: 0;
+}
+
+#page-content .content-header .separator {
+    border-left: 2px solid #e2e5ec;
+    height: 30px;
+    margin: 0 20px;
+}
+
+#page-content .content-body .card-filter {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    display: flex;
+    flex-direction: row;
+}
+
+#page-content .content-body .card-filter .field {
+    margin-bottom: 0;
+}
+
+#page-content .content-body .card-filter .field:not(:last-child) {
+    margin-right: 0.75rem;
+}
+
+#page-content .content-body .card-filter .field:first-child {
+    flex-grow: 1;
+}
+
+#page-content .content-body form .field.action {
+    margin-top: 1.5rem;
+}
+
+#page-content .content-body table .field.action.is-grouped {
+    justify-content: center;
+}
+
+#page-content .content-body table .field.action.is-grouped>.control:not(:last-child) {
+    margin-right: 0.3rem;
+}
+
+#page-content .content-body table .field.action .button.is-text {
+    text-decoration: none;
+    width: 2.25em;
+}
+
+#page-content .content-body table .field.action .button:hover {
+    background: #8D68AB;
+    color: #fff;
+}
+
+@media only screen and (max-width: 768px) {
+    #app-header .navbar-brand .navbar-item:first-child {
+        float: left;
+        height: 4.25rem;
+    }
+
+    #app-content {
+        padding-top: 4.5rem;
+    }
+
+    .navbar-burger {
+        color: #fff;
+    }
+
+    .navbar-burger:hover {
+        color: #8D68AB;
+    }
+
+    #page-content .content-header .separator,
+    #page-content .content-header nav.breadcrumb {
+        display: none;
+    }
+
+    #page-content .content-body .card-filter {
+        flex-direction: column;
+    }
+
+    #page-content .content-body .card-filter .field {
+        margin-bottom: .5rem;
+        margin-right: 0 !important;
+        height: 3rem;
+    }
+
+    #page-content .content-body .card-filter .field.has-addons .control {
+        flex: 1;
+    }
+
+    #page-content .content-body .card-filter .field.has-addons .button {
+        width: 100%;
+    }
+
+    #page-content .content-body .card-filter .field div,
+    #page-content .content-body .card-filter .field div input,
+    #page-content .content-body .card-filter .field div select {
+        width: 100%;
+    }
+
+    div.dataTables_wrapper div.dataTables_length,
+    div.dataTables_wrapper div.dataTables_filter,
+    div.dataTables_wrapper div.dataTables_info,
+    div.dataTables_wrapper div.dataTables_paginate {
+        justify-content: center;
+    }
+
+    div.dataTables_wrapper div.dataTables_paginate {
+        float: inherit;
+    }
+
+    div.dataTables_paginate .pagination-list li {
+        flex-grow: 0;
+    }
+
+    div.table-wrapper {
+        margin-bottom: calc(1.5rem - 0.75rem) !important;
+    }
+}
+
+/* SweetAlert2 */
+.swal2-popup .swal2-title {
+    font-size: 1.4rem;
+}
+
+.swal2-popup .swal2-content,
+.swal2-popup .swal2-styled.swal2-confirm,
+.swal2-popup .swal2-styled.swal2-cancel {
+    font-size: .9rem;
+}
+
+.swal2-actions button {
+    min-width: 105px;
+}
+
+.swal2-actions.swal2-loading button {
+    min-width: initial;
+}
+
+/* DataTable */
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:after {
+    font-family: 'Font Awesome 5 Free';
+    margin-left: 5px;
+    right: 0.5rem;
+    top: 0.5rem;
+}
+
+table.dataTable thead .sorting:after {
+    content: "\f160";
+}
+
+table.dataTable thead .sorting_asc:after {
+    content: "\f160";
+    opacity: 1;
+}
+
+table.dataTable thead .sorting_desc:after {
+    content: "\f161";
+    opacity: 1;
+}
+
+.dataTables_info {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.dataTables_wrapper .columns:nth-child(1) {
+    margin-bottom: 0;
+}
+
+.dataTables_wrapper .columns:nth-child(2) .column {
+    padding-top: 0px;
+}
+
+.ss-main .ss-single-selected {
+    height: 3em;
+    padding: 0;
+    padding-bottom: calc(0.375em - 1px);
+    padding-left: calc(0.625em - 1px);
+    padding-right: calc(0.625em - 1px);
+    padding-top: calc(0.375em - 1px);
+}
+
+.ss-main .ss-single-selected .ss-arrow {
+    margin: 0 9px 0 5px;
+}
+
+figure.avatar img {
+    max-height: 100%;
+    /* border-radius: 100px; */
+}
+
+.card-image:before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    position: absolute;
+    left: 0;
+}
+
+.card-image img {
+    opacity: 0.5;
+}
+
+.jqstooltip {
+    width: auto !important;
+    height: auto !important;
+}
+
+#navigation .menu {
+    position: fixed;
+    width: inherit;
+}
+
+.row-item {
+    margin-bottom: 1.5rem;
+}
+
+.pagination {
+    font-size: 0.9rem;
+    margin: -0.25rem;
+}
+
+.pagination.is-small {
+    font-size: 0.65rem;
+}
+
+.pagination.is-medium {
+    font-size: 1rem;
+}
+
+.pagination.is-large {
+    font-size: 1.2rem;
+}
+
+.pagination.is-rounded .pagination-previous,
+.pagination.is-rounded .pagination-next {
+    padding-left: 1em;
+    padding-right: 1em;
+    border-radius: 290486px;
+}
+
+.pagination.is-rounded .pagination-link {
+    border-radius: 290486px;
+}
+
+.pagination,
+.pagination-list {
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.pagination-previous,
+.pagination-next,
+.pagination-link,
+.pagination-ellipsis {
+    font-size: 1em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin: 0.25rem;
+    text-align: center;
+}
+
+.pagination-previous,
+.pagination-next,
+.pagination-link {
+    border-color: #dbdbdb;
+    color: #363636;
+    min-width: 2.25em;
+}
+
+.pagination-previous:hover,
+.pagination-next:hover,
+.pagination-link:hover {
+    border-color: #b5b5b5;
+    color: #363636;
+}
+
+.pagination-previous:focus,
+.pagination-next:focus,
+.pagination-link:focus {
+    border-color: #3273dc;
+}
+
+.pagination-previous:active,
+.pagination-next:active,
+.pagination-link:active {
+    -webkit-box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.2);
+    box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.2);
+}
+
+.pagination-previous[disabled],
+.pagination-next[disabled],
+.pagination-link[disabled] {
+    background-color: #dbdbdb;
+    border-color: #dbdbdb;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    color: #7a7a7a;
+    opacity: 0.5;
+}
+
+.pagination-previous,
+.pagination-next {
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+    white-space: nowrap;
+}
+
+.pagination-link.is-current {
+    background-color: #3273dc;
+    border-color: #3273dc;
+    color: #fff;
+}
+
+.pagination-ellipsis {
+    color: #b5b5b5;
+    pointer-events: none;
+}
+
+.pagination-list {
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+
+@media screen and (max-width: 768px) {
+    .pagination {
+        -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    }
+
+    .pagination-previous,
+    .pagination-next {
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        -ms-flex-negative: 1;
+        flex-shrink: 1;
+    }
+
+    .pagination-list li {
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        -ms-flex-negative: 1;
+        flex-shrink: 1;
+    }
+}
+
+@media screen and (min-width: 769px),
+print {
+    .pagination-list {
+        -webkit-box-flex: 1;
+        -ms-flex-positive: 1;
+        flex-grow: 1;
+        -ms-flex-negative: 1;
+        flex-shrink: 1;
+        -webkit-box-pack: start;
+        -ms-flex-pack: start;
+        justify-content: flex-start;
+        -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+        order: 1;
+    }
+
+    .pagination-previous {
+        -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+        order: 2;
+    }
+
+    .pagination-next {
+        -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+        order: 3;
+    }
+
+    .pagination {
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+    }
+
+    .pagination.is-centered .pagination-previous {
+        -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+        order: 1;
+    }
+
+    .pagination.is-centered .pagination-list {
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        justify-content: center;
+        -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+        order: 2;
+    }
+
+    .pagination.is-centered .pagination-next {
+        -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+        order: 3;
+    }
+
+    .pagination.is-right .pagination-previous {
+        -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+        order: 1;
+    }
+
+    .pagination.is-right .pagination-next {
+        -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+        order: 2;
+    }
+
+    .pagination.is-right .pagination-list {
+        -webkit-box-pack: end;
+        -ms-flex-pack: end;
+        justify-content: flex-end;
+        -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+        order: 3;
+    }
+}
+
+.select:not(.is-multiple), .select select {
+    height: 100%;
+}
+
+.table-footer-wrapper {
+    margin-top: .75rem;
+}
+</style>

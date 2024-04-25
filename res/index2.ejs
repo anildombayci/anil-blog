@@ -1,0 +1,93 @@
+<%- include('header.ejs') %>
+<% var selectedTag = "Kategori seç"; %>
+<div class="container">
+<section class="articles">
+  <div class="columns is-multiline" id="articles">
+    <% let posts = db.get("post"); %>
+    <% if (posts) { %>
+      <% Object.keys(posts).forEach(key => { %>
+        <% let post = db.get("post." + key)[0]; %>
+        <% if (selectedTag === "Kategori seç" || post.tag === selectedTag) { %>
+        <div class="column is-one-third">
+          <div class="card article">
+            <div class="card-content">
+              <div class="media">
+                <div class="media-left">
+                </div>
+                <div class="media-content">
+                  <p class="title article-title"><a style="color:black" href="/post/<%= key %>"><%= post.title %></a></p>
+                  <div class="tags has-addons level-item">
+                    <span class="tag is-rounded is-info"><i class="fas fa-user"></i>- <%= post.author %></span>
+                    <span class="tag is-rounded"><%= post.date %> - <i class="far fa-calendar-alt"></i></span>
+                    <span class="tag is-rounded is-warning"><%= post.tag %></span>
+                  </div>
+                  <div class="content article-body">
+                    <% if (post.desc.length > 15) { %>
+                      <p><%= post.desc.substring(0, 15) %>...</p>
+                    <% } else { %>
+                      <p><%= post.desc %></p>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      <% }); %>
+    <% } %>
+  </div>
+</section>
+</div>
+<br>
+<br>
+<br>
+<div class="container">
+  <div class="columns is-centered">
+    <div class="column is-half has-text-centered">
+      <div class="dropdown is-hoverable is-right">
+        <div class="dropdown-trigger">
+          <div id="dropdown-menu" class="select is-rounded">
+            <select class="is-hovered" onchange="filterByTag(this.value)">
+              <option value="Kategori seç">Kategori seç</option>
+              <option value="laflar">laflar</option>
+              <option value="gerçekler">gerçekler</option>
+              <option value="bilgilendirme">bilgilendirme</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('footer.ejs') %>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Dropdown menüsünü seç
+    var dropdown = document.querySelector('.is-hoverable select');
+
+    // Seçili kategoriyi yerel depolamadan al ve dropdown menüsünde seçili olarak belirle
+    var selectedTag = localStorage.getItem("selectedTag") || "Kategori seç";
+    dropdown.value = selectedTag;
+    
+    // Dropdown menüsündeki seçim değiştikçe tetiklenecek fonksiyonu ekle
+    dropdown.addEventListener('change', function(event) {
+      // Seçilen seçeneği al
+      var selectedOption = event.target.value;
+
+      // Seçilen seçeneği yerel depolamaya kaydet
+      localStorage.setItem("selectedTag", selectedOption);
+
+      // Seçilen seçeneği konsola yazdır (örneğin, test amaçlı)
+      console.log('Seçilen seçenek:', selectedOption);
+    });
+  });
+
+  function filterByTag(tag) {
+    // Seçilen kategoriyi yerel depolamaya kaydet
+    localStorage.setItem("selectedTag", tag);
+    
+    // Yeniden yükleme yap
+    location.reload();
+  }
+</script>
