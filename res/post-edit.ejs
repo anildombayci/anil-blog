@@ -1,0 +1,151 @@
+<%- include('header.ejs') %>
+<link href="https://fonts.googleapis.com/icon?family=Poppins" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/font-awesome-line-awesome/css/all.min.css" integrity="sha512-dC0G5HMA6hLr/E1TM623RN6qK+sL8sz5vB+Uc68J7cBon68bMfKcvbkg6OqlfGHo1nMmcCxO5AinnRTDhWbWsA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css" integrity="sha512-HqxHUkJM0SYcbvxUw5P60SzdOTy/QVwA1JJrvaXJv4q7lmbDZCmZaqz01UPOaQveoxfYRv1tHozWGPMcuTBuvQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    body {
+        background-color: #f4f4f4;
+        padding: 20px;
+    }
+
+    .post-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .post-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .post-author {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+
+    .post-date {
+        font-size: 14px;
+        color: #999;
+        margin-bottom: 15px;
+    }
+
+    .post-description {
+        font-size: 18px;
+        line-height: 1.6;
+    }
+
+    .comments-container {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ccc;
+    }
+
+    .comment {
+        margin-bottom: 20px;
+    }
+
+    .comment-author {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .comment-content {
+        font-size: 16px;
+    }
+
+    .like-button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        position: absolute;
+        top: 20px;
+        right: calc(4.2% + 20px);
+        transform: translateX(50%);
+    }
+
+    .like-button .icon {
+        font-size: 24px;
+        /* İkon boyutunu ayarlayın */
+    }
+
+    .like-button:hover .icon {
+        color: #ff8c00;
+        /* Hover rengini ayarlayın */
+    }
+
+    .like-count {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+
+    .edit-button {
+        position: absolute;
+        top: 20px;
+        right: 70px;
+        /* Sol tarafa olan uzaklığı artırıldı */
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .edit-button:hover {
+        color: #ff8c00;
+        /* Hover rengini ayarlayın */
+    }
+</style>
+</head>
+<body>
+    <% let post2 = db.get(`post.${id}`) %>
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-half">
+                <div class="post-container">
+                    <h1 class="post-title"><input type="text" id="editedTitle" value="<%= post2.title %>"></h1>
+                    <h1 class="post-title"><input type="text" id="editedAuthor" value="<%= post2.author %>"></h1>
+                    <p class="post-date">Tarih: <%= post2.date %></p>
+                    <p class="post-description"><textarea id="editedDesc" rows="4"><%= post2.desc %></textarea></p>
+                    <button onclick="saveChanges()">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+function saveChanges() {
+  var editedTitle = document.getElementById("editedTitle").value;
+  var editedDesc = document.getElementById("editedDesc").value;
+  var editedAuthor = document.getElementById("editedAuthor").value;
+  console.log(window.location.pathname.split("/post/")[1].split("/edit")[0]);
+  // Axios ile POST isteği gönderme
+  axios
+    .post(
+      "/post/" +
+        window.location.pathname.split("/post/")[1].split("/edit")[0] +
+        "/edit",
+      {
+        title: editedTitle,
+        desc: editedDesc,
+        author: editedAuthor
+      }
+    )
+    .then(function (response) {
+      console.log(response.data);
+      alert("Değişiklikler başarıyla kaydedildi!");
+    })
+    .catch(function (error) {
+      console.error(error);
+      alert("Bir hata oluştu. Lütfen tekrar deneyin.");
+    });
+}
+  
+    </script>
+</body>
+<%- include('footer.ejs') %>

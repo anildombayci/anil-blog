@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bu sayfaya gitmek istediğine emin misin?</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section class="hero is-fullheight is-primary is-bold">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1">Emin misin?</h1>
+              <p class="subtitle is-3">Ziyaret etmek istediğiniz bağlantı, <strong>"anil-blog"</strong> ile ilgili <strong>olmayan</strong> bir hedefe yönlendirebilir.</p>
+                <div class="buttons is-centered">
+                  <form action="/link/<%=url%>" method="post">
+                    <button type="submit" class="button is-primary is-large is-rounded">Evet, Devam et</button>
+                  </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

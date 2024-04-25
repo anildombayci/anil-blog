@@ -1,0 +1,70 @@
+<%- include('header.ejs') %>
+<div class="container">
+  <section class="articles">
+    <div class="columns is-multiline">
+      <% let posts = db.get("post"); %>
+      <% if (posts) { %>
+        <% Object.keys(posts).forEach(key => { %>
+          <% let post = db.get("post." + key); %>
+          <div class="column is-one-third">
+            <div class="card article">
+              <div class="card-content">
+                <div class="media">
+                  <div class="media-left">
+                  </div>
+                  <div class="media-content">
+                    <p class="title article-title"><a style="color:black" href="/post/<%= key %>"><%= post.title %></a></p>
+                    <div class="tags has-addons level-item">
+                      <span class="tag is-rounded is-info"><i class="fas fa-user"></i>- <%= post.author %></span>
+                      <span class="tag is-rounded"><%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }) %> - <i class="far fa-calendar-alt"></i></span>
+                    </div>
+                    <div class="content article-body">
+                      <% if (post.desc.length > 15) { %>
+                        <p><%= post.desc.substring(0, 15) %>...</p>
+                      <% } else { %>
+                        <p><%= post.desc %></p>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </section>
+</div>
+<%- include('footer.ejs') %>
+
+<style>
+  /* Existing styles... */
+
+  /* New styles for side-by-side alignment and title centering */
+  .media {
+    display: flex; /* Make media container a flexbox */
+  }
+
+  .media-left {
+    flex: 0 0 auto; /* Set fixed width for image (optional) */
+    margin-right: 10px; /* Add spacing between image and text */
+  }
+
+  .media-content {
+    flex: 1 1 auto; /* Allow text content to grow */
+    display: flex; /* Make content container a flexbox for vertical alignment */
+    flex-direction: column; /* Stack elements vertically */
+    justify-content: center; /* Vertically center content within media-content */
+    align-items: center; /* Horizontally center content within media-content */
+  }
+
+  .article-title {
+    text-align: center; /* Center title text within the card */
+  }
+
+  .author {
+    /* Additional styles for author name (optional) */
+    margin-top: 5px; /* Add some space above author name */
+    font-size: 14px; /* Adjust font size for author name */
+  }
+</style>

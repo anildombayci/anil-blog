@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang='tr'>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Anıl Blog">
+  <meta property="og:site_name" content="Anıl Blog">
+  <meta property="og:description" content="<%= siteAdı %>">
+  <meta name="description" content="<%= siteAdı %>">
+  <meta name="theme-color" content="#00d4ff">
+  <meta charset="UTF-8">
+  <script src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <style> ::-webkit-scrollbar{height:10px;width:10px}::-webkit-scrollbar-track{background:#efefef;border-radius:6px}::-webkit-scrollbar-thumb{background:#d5d5d5;border-radius:6px}::-webkit-scrollbar-thumb:hover{background:#c4c4c4}</style>
+  <link rel="stylesheet" href="https://unpkg.com/bulma@1.0.0/css/bulma.min.css" />
+  <script src="https://kit.fontawesome.com/7dc3015a44.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Poppins" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/line-awesome/1.3.0/font-awesome-line-awesome/css/all.min.css" integrity="sha512-dC0G5HMA6hLr/E1TM623RN6qK+sL8sz5vB+Uc68J7cBon68bMfKcvbkg6OqlfGHo1nMmcCxO5AinnRTDhWbWsA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+	<title><%= siteAdı %></title>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item" href="/">
+                  <h1 id="yazıt">
+                      Anıl Blog
+                  </h1>
+                </a>
+                <a class="navbar-burger burger" role="button" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                </a>
+            </div>
+            <div id="navbarMenu" class="navbar-menu">
+                <div class="navbar-end">
+                    <a class="navbar-item" href="/404">
+                            YAKINDA
+                        </a>
+                    <a class="navbar-item" href="/404">
+                            YAKINDA
+                        </a>
+              </div>
+              <div class="navbar-end">
+              <% if (!user) { %>
+                  <a class="navbar-item" href="/login">Giriş Yap</a>
+              <% } else { %>
+                <div class="navbar-item has-dropdown is-hoverable">
+                      <a class="navbar-link">
+                        Hoşgeldin! <%- user.username.replace("admin", "Anıl Bey") %>
+                      </a>
+                      <div id="navbarMenu" class="navbar-menu">
+                        <div class="navbar-dropdown">
+                        <a class="navbar-item" href="/admin">
+                          Yönetim Paneli
+                        <hr class="navbar-divider">
+                        <a class="navbar-item" href="/logout">
+                          Çıkış yap
+                        </a>
+                        </div>
+                        </div>
+                  </div>
+                <% } %>
+                </div>
+               </div>
+            </div>
+        </div>
+    </nav>
+<div class="notification is-info is-light">
+  <center>
+  <strong>Hoş geldiniz!</strong> Blog sistemim şu anda <strong>BETA Aşamasındadır.</strong> sistemi kullanırken herhangi bir sorunla karşılaşırsanız veya geri bildirimde bulunmak isterseniz, <strong>lütfen bize bildirin.</strong>
+  </center>
+</div>
+<script src="https://unpkg.com/js-cookie@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+(function() {
+    var burger = document.querySelector('.burger');
+    var menu = document.querySelector('#'+burger.dataset.target);
+    burger.addEventListener('click', function() {
+        burger.classList.toggle('is-active');
+        menu.classList.toggle('is-active');
+    });
+})();          
+
+function likePost() {
+    var likeCount = document.getElementById('likeCount');
+    var currentLikes = parseInt(likeCount.innerText);
+
+    // Verilen URL'yi alın
+    var url = window.location.href;
+
+    // URL'yi '/' karakterlerine göre bölelim
+    var segments = url.split('/');
+
+    // Son bölümdeki sayıyı alalım
+    var postId = segments[segments.length - 1];
+
+    console.log(postId); // Sonundaki sayı
+
+    // Kullanıcının daha önce beğendiği bir gönderi var mı kontrol edin
+    var alreadyLiked = Cookies.get(`liked.${postId}`)
+
+    if (!alreadyLiked) {
+        currentLikes++;
+        likeCount.innerText = currentLikes;
+
+        // Burada veritabanına ekleme işlemini gerçekleştirin
+    axios.post("/post/" + postId, {})
+      .then(response => {
+      console.log(response.data); // Sunucudan gelen yanıtı konsola yazdır
+    }).catch(error => {
+      console.error(error); // Hata durumunda konsola hatayı yazdır
+    });
+
+        // Daha önce beğenildiği işaretini çerezde saklayın
+        Cookies.set(`liked.${postId}`, 'true');
+    } else {
+        alert('Bu yazıyı zaten beğendiniz.');
+    }
+}
+
+</script>
+<style>
+  body {
+    background-color: #f4f4f4;
+    padding: 20px;
+  }
+  
+  .post-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+  
+  .post-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .post-author {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+  
+  .post-date {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 15px;
+  }
+  
+  .post-description {
+    font-size: 18px;
+    line-height: 1.6;
+  }
+  
+.comments-container {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ccc;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+.comment {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.comment-author {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.comment-content {
+  font-size: 16px;
+  color: #666;
+}
+
+/* Hover effect for comments */
+.comment:hover {
+  background-color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+  
+.comment-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+.comment-date {
+  margin-left: 10px; /* İstenilen boşluk */
+}
+
+  
+.like-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 20px;
+  right: calc(4.2% + 20px);
+  transform: translateX(50%);
+}
+
+.like-button .icon {
+  font-size: 24px; /* İkon boyutunu ayarlayın */
+}
+
+.like-button:hover .icon {
+  color: #ff8c00; /* Hover rengini ayarlayın */
+}
+
+.like-count {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+.edit-button {
+  position: absolute;
+  top: 20px;
+  right: 70px; /* Sol tarafa olan uzaklığı artırıldı */
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-button:hover {
+  color: #ff8c00; /* Hover rengini ayarlayın */
+}
+
+.edited-indicator {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 3px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+  font-size: 9px;
+  color: #333;
+}
+</style>
+</head>
+<body>
+<% let post2 = db.get(`post.${id}`) %>
+<div class="container">
+  <div class="columns is-centered">
+    <div class="column is-half">
+      <div class="post-container">
+        <h1 class="post-title"><%= post2.title %></h1>
+        <p class="post-author">Yazar: <%= post2.author %></p>
+        <p class="post-date">Tarih: <%= new Date(post2.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }); %></p>
+        <p class="post-description"><%= post2.desc %></p>
+<!-- Düzenleme düğmesi -->
+     <% if (user) { %>
+          <a class="edit-button" style="color:black" href="/post/<%= id %>/edit">
+          <span class="icon">
+          <i class="fas fa-edit"></i> <!-- Edit icon -->   
+          </span>
+         </a>
+     <% } %>
+        <button class="like-button" onclick="likePost()">
+          <span class="icon">
+            <i class="fa fa-arrow-up"></i> <!-- Thumbs up icon -->
+          </span>
+        </button>
+       <% if (post2.edited === true) { %>
+       <div class="edited-indicator">Düzenlendi</div>
+      <% } %>
+       <span class="like-count" id="likeCount"><%= post2.likes || 0 %></span>
+      </div>
+<div class="comments-container">
+  <h3 class="title is-3">Yorumlar</h3>
+<div class="comment">
+  <div class="comment-content">
+    <p>Yorum ve Blog kurallarına uyun, saygıyı esas alın. Olumlu bir ortam için herkes katkıda bulunsun. Teşekkürler!</p>
+    <div class="comment-meta">
+      <span class="comment-author">Zero BOT <span class="ai-text" style="color:red"><i class="fa fa-globe"></i> AI</span></span>
+      <span class="comment-date"><%=new Date().toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' , hour: 'numeric', minute: 'numeric' });%></span> <!-- Buraya tarih ve saat bilgisini ekleyin -->
+    </div>
+  </div>
+</div>
+  <% let veri = post2.comments %>
+  <% if (veri && veri.length > 0) { %>
+    <% veri.forEach(comment => { %>
+<div class="comment">
+  <div class="comment-content">
+    <p><%= comment.comment %></p>
+    <div class="comment-meta">
+      <% if (comment.name === "Anıl") { %>
+        <span class="comment-author">Anıl Bey <span class="ai-text" style="color:red"><i class="fa fa-crown"></i> OWNER</span></span>
+      <% } else if (comment.name === "ZBT") { %>
+      <span class="comment-author">Zero BOT <span class="ai-text" style="color:red"><i class="fa fa-globe"></i> AI</span></span>
+        <% } else { %>
+            <span class="comment-author"><%= comment.name %></span>
+          <% } %>
+      <span class="comment-date"><%=new Date(comment.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' , hour: 'numeric', minute: 'numeric' });%></span>
+    </div>
+  </div>
+</div> 
+<% }) %>
+  <% } %>
+</div>
+<br>
+<% if (user) { %>
+  <div class="add-comment">
+    <form action="/post/<%=id%>/comment" method="POST">
+      <div class="field">
+        <label class="label">Yorum Yap</label>
+        <div class="control">
+          <input id="name" name="name" class="input is-rounded" value="Anıl" maxlength="15" readonly>
+        </div>
+        <div class="control">
+          <textarea id="comment" name="comment" class="input is-rounded" placeholder="Yorumunuz" required></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" type="submit">Yorum Yap</button>
+        </div>
+      </div>
+    </form>
+  </div>
+<% } else { %>
+  <div class="add-comment">
+    <form action="/post/<%=id%>/comment" method="POST">
+      <div class="field">
+        <label class="label">Yorum Yap</label>
+        <div class="control">
+          <input id="name" name="name" class="input is-rounded" placeholder="yorumda gözükecek isim" maxlength="15" required></textarea>
+        </div>
+        <div class="control">
+          <textarea id="comment" name="comment" class="input is-rounded" placeholder="Yorumunuz" maxlength="100" required></textarea>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-primary" type="submit">Yorum Yap</button>
+        </div>
+      </div>
+    </form>
+  </div>
+<% } %>
+    </div>
+  </div>
+</div>
+<br>
+<br>
+<%- include('footer.ejs') %>
+</body>
+</html>
