@@ -16,7 +16,7 @@ let express = require("express"),
   ayarlar = {
     port: 3000,
     spotifyToken:
-      "BQAz_w0yi4eFEBM0sddXEVvVlz1Uctvy43_j7gXDI3lzKYLodQ9U8X-wfeWJb2xXDSBtXn37OLfgZE2SZcMhZwlAFlAoTF-au75OfxXc2F9a4RLP6kPBcMgVTDv_pTwvKEwysincBVObdPPUpTp_O40iAYHteGhLmiZrhqxkqvdRC5nNug8ADyIe2Iu4BKxsrhxMkUnlU1Cz6_trf8dY2VvbeqnAVLMN1uDgrKow94YsNXzAYDayk1A0JOi6AuO4NzhVxsYsDEISw2gdRtmbWYZ2",
+      "",
   },
   path = require("path"),
   passport = require("passport"),
