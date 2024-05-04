@@ -21,7 +21,7 @@
     "moment-timezone": "^0.5.45",
     "fs-extra": "^11.2.0",
     "axios": "^0.28.1",
-    "database.xr": "^1.0.0"
+    "database.xr": "^1.0.1"
   },
   "engines": {
     "node": "14.x"
