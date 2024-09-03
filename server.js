@@ -23,7 +23,11 @@ let express = require("express"),
   LocalStrategy = require("passport-local").Strategy,
   helmet = require("helmet"),
   moment = require("moment-timezone"),
-  axios = require("axios");
+  axios = require("axios"),
+  http = require("http"),
+  socket = require("socket.io"),
+  server = http.createServer(app),
+  io = socket(server)
 
 app.use(express.static("dist"));
 app.use(bodyParser.json());
@@ -105,7 +109,7 @@ const hh = (txt) => {
   const yeniHareket = txt; // Yeni hareket metnini oluştur, örneğin burada sabit bir metin kullanıyorum
 
   // Eğer veri dizisinin uzunluğu 10 veya daha fazlaysa, en eski hareketi kaldır
-  if (Object.keys(veri).length >= 10) {
+  if (Object.keys(veri).length >= 12) {
     veri.shift(); // En eski hareketi kaldır
   }
 
@@ -143,8 +147,25 @@ app.get("/dino", (req, res) => {
 
 app.get("/test", (req, res) => {
   hh("/test domain sayfasına girildi.");
+  yukle(res, req, "test.ejs");
 });
 
+app.post("/test", (req, res) => {
+  /*
+  if (yorumK(req.body.test)) {
+    res.send("küfür var")    
+  } else {
+    res.send("küfür yok")
+  }
+  */
+})
+
+//-----------{Notification}---------------------
+
+app.get('/notifications', (req, res) => {
+    res.json({ count: 2 });
+});
+//-----------{Notification}---------------------
 app.get("/login", (req, res) => {
   yukle(res, req, "login.ejs");
 });
@@ -185,6 +206,18 @@ app.get("/admin/sht", async function (req, res) {
 
 //---------------------------------------[BLOG Başlangıç]-----------------------------------------------
 
+// POST request for archiving a post
+app.post('/postarchive', (req, res) => {
+  const postId = req.body.postId;
+  if (db.get(`post.${postId}.archived`) === true) {
+    db.set(`post.${postId}.archived`, false)
+    res.status(200).send("Arşivden kaldırıldı")
+  } else if (db.get(`post.${postId}.archived`) === false) {
+    db.set(`post.${postId}.archived`, true)
+    res.status(200).send("Arşivlendi")
+  }
+});
+
 app.get("/postyayinla", async function (req, res) {
   if (checkAuth(req, res)) {
     // Use checkAuth function
@@ -208,7 +241,8 @@ app.post("/postyayinla", async function (req, res) {
     sarki_id = ayar["selectedTrackId"],
     sarki_isim = ayar["selectedTrackName"],
     sarki_sanatcilar = ayar["selectedTrackArtists"],
-    sarki_prev = ayar["selectedTrackPrev"];
+    sarki_prev = ayar["selectedTrackPrev"],
+    archived = ayar["archived"] ? true : false;
 
   console.log(req.body);
   if (!title && !aciklama)
@@ -221,6 +255,7 @@ app.post("/postyayinla", async function (req, res) {
       author: author,
       edited: false,
       likes: 0,
+      archived: archived
     });
   } else {
     db.set("post." + date2, {
@@ -236,6 +271,7 @@ app.post("/postyayinla", async function (req, res) {
         sanatcilar: sarki_sanatcilar,
         prev: sarki_prev,
       },
+      archived: archived
     });
   }
   hh(
@@ -294,16 +330,45 @@ app.post("/post/:id", (req, res) => {
   res.status(200).send(true);
 });
 
+function yorumK(y) {
+  let küfürler = require("./extras/küfürler.json")
+  let words = y.toLowerCase().split(/\s+/);
+    for (let i = 0; i < words.length; i++) {
+        if (küfürler.includes(words[i])) {
+            return true; 
+        } else {
+            return false;
+        }
+    }
+  return false
+}
+
 app.post("/post/:id/comment", (req, res) => {
   let id = req.params.id;
   let ayar = req.body;
+  if (ayar.name !== "Anıl" && yorumK(ayar.comment)) {
+    res.send("Yorumunuzda küfür tespit edilmiştir. Toplum kurallarına uyarak yorum paylaşmanızı şiddetle tavsiye ediyorum.") 
+    hh(`[BLOG-POST-ZEROAI] - "${id}" id'li post'a küfürlü yorum paylaşıldı. Ve ZeroBOT tarafından engellendi.`)
+    db.add("ek", +1)
+    db.push(`post.${id}.comments`, {
+      name: "ZBT",
+      comment: `"${ayar.name}" tarafından paylaşılan kişinin kural dışı yorumu engellendi.`,
+      date: Date.now(),
+  });
+  } else {
   db.push(`post.${id}.comments`, {
     name: ayar.name,
     comment: ayar.comment,
     date: Date.now(),
   });
   hh(`[BLOG-POST] - "${id}" id'li post'a yorum yapıldı!`);
+  // Bildirim olayını yay
+  io.emit('notification', {
+    postId: id,
+    name: ayar.name
+  });
   res.redirect(`/post/${id}`);
+  }
 });
 
 app.get("/post/:id/edit", async function (req, res) {
