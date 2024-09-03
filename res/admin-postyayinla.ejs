@@ -153,6 +153,55 @@
       </ul>
         </nav>
     </div>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .card-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .card-content h4 {
+            margin-bottom: 20px;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .button.is-primary {
+            background-color: #3273dc;
+            border-color: #3273dc;
+        }
+        .button.is-primary:hover {
+            background-color: #276cda;
+            border-color: #276cda;
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .table thead th {
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        .table tbody td {
+            vertical-align: middle;
+        }
+        .checkbox {
+            margin-top: 10px;
+        }
+        .separator {
+            height: 2px;
+            background-color: #d3d3d3;
+            margin: 20px 0;
+        }
+        .breadcrumb {
+            margin-bottom: 20px;
+        }
+    </style>
 <div class="card-content">
     <form action="/postyayinla" method="post">
         <div class="field is-horizontal">
@@ -207,6 +256,23 @@
                 </div>
             </div>
         </div>
+      <br>
+        <!-- Arşivli olarak paylaş checkbox -->
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label"></label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <label class="checkbox">
+                            <input type="checkbox" id="archived" name="archived">
+                            Arşivli olarak paylaş
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
         <input type="hidden" id="selectedTrackId" name="selectedTrackId" value="">
         <input type="hidden" id="selectedTrackName" name="selectedTrackName" value="">
         <input type="hidden" id="selectedTrackArtists" name="selectedTrackArtists" value="">
@@ -236,7 +302,7 @@
 <script>
     async function searchSpotify() {
         const searchQuery = document.getElementById('searchInput').value;
-        const accessToken = 'BURAYA SPOTİFY API ANAHTARI GİRİLECEK';
+        const accessToken = 'BQAps1bt7jM2OUpBRkhZHYA_YaMHLdUR_2Gng2mmkeOvvE60fk3h4865zxWSowuZB-nLkJ8t10pVDfvQUpD2xXHjPyzsjDM_QY07T9CcH9sM2fo1jh989AAdbdpm_7XsvCQRcE0HKBJDHm3QRoyrD6wAPJ8k2iq4f-lV0bwQ5xPqKHrMYh735SHLH-59unHtWn1eUSAxoUyaWFlQMw6rnx1oLHywWrTreKbb-8qd-Z_b-PSzMjSd0QT2NnNQtcwvRl0XuT7-xWqF2m__r4JRw9PV';
         const apiUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=track&limit=5`;
 
         try {
