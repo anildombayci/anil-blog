@@ -15,8 +15,7 @@ let express = require("express"),
   }),
   ayarlar = {
     port: 3000,
-    spotifyToken:
-      "",
+    spotifyToken: "",
   },
   path = require("path"),
   passport = require("passport"),
@@ -27,8 +26,8 @@ let express = require("express"),
   http = require("http"),
   socket = require("socket.io"),
   server = http.createServer(app),
-  io = socket(server)
-
+  io = socket(server),
+  messages = require("./extras/messages.js");
 app.use(express.static("dist"));
 app.use(bodyParser.json());
 app.use(
@@ -158,12 +157,12 @@ app.post("/test", (req, res) => {
     res.send("küfür yok")
   }
   */
-})
+});
 
 //-----------{Notification}---------------------
 
-app.get('/notifications', (req, res) => {
-    res.json({ count: 2 });
+app.get("/notifications", (req, res) => {
+  res.json({ count: 2 });
 });
 //-----------{Notification}---------------------
 app.get("/login", (req, res) => {
@@ -174,7 +173,7 @@ app.post(
   "/login",
   passport.authenticate("local", { failureRedirect: "/login" }),
   function (req, res) {
-    hh(`[LOGIN] - "Anıl Bey" kişisi siteye giriş yaptı.`), res.redirect("/");
+    hh(messages.login), res.redirect("/");
   }
 );
 
@@ -183,7 +182,7 @@ app.get("/logout", function (req, res, next) {
     if (err) {
       return next(err);
     }
-    hh(`[LOGIN] - "Anıl Bey" kişisi siteye çıkış yaptı.`);
+    hh(messages.logout);
     res.redirect("/");
   });
 });
@@ -194,7 +193,7 @@ app.get("/admin", async function (req, res, next) {
     yukle(res, req, "admin.ejs");
   } else {
     // Handle unauthorized access (e.g., redirect to login)
-    hh(`[SISTEM] - "/admin" sayfasına yetkisiz giriş yapılmaya çalışıldı.`);
+    hh(messages.fail.admin_auth);
     res.status(403).send("Insufficient permissions."); // Or redirect to login page
   }
 });
@@ -207,14 +206,16 @@ app.get("/admin/sht", async function (req, res) {
 //---------------------------------------[BLOG Başlangıç]-----------------------------------------------
 
 // POST request for archiving a post
-app.post('/postarchive', (req, res) => {
+app.post("/postarchive", (req, res) => {
   const postId = req.body.postId;
   if (db.get(`post.${postId}.archived`) === true) {
-    db.set(`post.${postId}.archived`, false)
-    res.status(200).send("Arşivden kaldırıldı")
+    db.set(`post.${postId}.archived`, false);
+    res.status(200).send("Arşivden kaldırıldı");
+    hh(messages.post_archive.unarchived.replace("{postId}", postId));
   } else if (db.get(`post.${postId}.archived`) === false) {
-    db.set(`post.${postId}.archived`, true)
-    res.status(200).send("Arşivlendi")
+    db.set(`post.${postId}.archived`, true);
+    res.status(200).send("Arşivlendi");
+    hh(messages.post_archive.archived.replace("{postId}", postId));
   }
 });
 
@@ -224,9 +225,7 @@ app.get("/postyayinla", async function (req, res) {
     yukle(res, req, "admin-postyayinla.ejs");
   } else {
     // Handle unauthorized access (e.g., redirect to login)
-    hh(
-      `[SISTEM] - "/postyayinla" sayfasına yetkisiz giriş yapılmaya çalışıldı.`
-    );
+    hh(messages.unauthorized_postpublish);
     res.status(401).send("Insufficient permissions."); // Or redirect to login page
   }
 });
@@ -255,7 +254,7 @@ app.post("/postyayinla", async function (req, res) {
       author: author,
       edited: false,
       likes: 0,
-      archived: archived
+      archived: archived,
     });
   } else {
     db.set("post." + date2, {
@@ -271,12 +270,22 @@ app.post("/postyayinla", async function (req, res) {
         sanatcilar: sarki_sanatcilar,
         prev: sarki_prev,
       },
-      archived: archived
+      archived: archived,
     });
   }
-  hh(
-    `[BLOG] - "${title}" yazıt başlığına sahip "${date2}" anahtarına sahip yazıt başarıyla yayınlandı!`
-  );
+  if (archived === true) {
+    hh(
+      messages.success.post_published_archived
+        .replace("{title}", title)
+        .replace("{date2}", date2)
+    );
+  } else {
+    hh(
+      messages.success.post_published
+        .replace("{title}", title)
+        .replace("{date2}", date2)
+    );
+  }
   xariona.success(
     `"${title}" başlığında yeni bir post paylaşıldı! ${xariona.tick}`
   );
@@ -287,7 +296,7 @@ app.get("/postlar", async function (req, res) {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-postlar.ejs");
   } else {
-    hh(`[SISTEM] - "/postlar" sayfasına yetkisiz giriş yapılmaya çalışıldı.`);
+    hh(messages.fail.unauthorized_postpage);
     res.status(401).send("Insufficient permissions.");
   }
 });
@@ -297,9 +306,7 @@ app.get("/postlar/:id/yorumlar", async function (req, res) {
     let id = req.params.id;
     yukle(res, req, "admin-yorumlar.ejs", { id: id });
   } else {
-    hh(
-      `[SISTEM] - "/postlar/:id/yorumlar" sayfasına yetkisiz giriş yapılmaya çalışıldı.`
-    );
+    hh(messages.fail.unauthorized_postcomment);
     res.status(401).send("Insufficient permissions.");
   }
 });
@@ -312,7 +319,9 @@ app.post("/postlar/:id/yorumlar", async function (req, res) {
   veri2 = veri.filter((x) => x.date !== tarih); // Tarihi sayıya çevirdik; // Filtrelenmiş veriyi konsola yazdırma
   db.set(`post.${id}.comments`, veri2);
   hh(
-    `[BLOG-POST] - "${id}" id'li posttan "${req.body.date} kodlu yorum kaldırıldı."`
+    messages.post_comment_deleted
+      .replace("{id}", id)
+      .replace("{date}", req.body.date)
   );
   res.status(200).send(true);
 });
@@ -331,43 +340,45 @@ app.post("/post/:id", (req, res) => {
 });
 
 function yorumK(y) {
-  let küfürler = require("./extras/küfürler.json")
+  let küfürler = require("./extras/küfürler.json");
   let words = y.toLowerCase().split(/\s+/);
-    for (let i = 0; i < words.length; i++) {
-        if (küfürler.includes(words[i])) {
-            return true; 
-        } else {
-            return false;
-        }
+  for (let i = 0; i < words.length; i++) {
+    if (küfürler.includes(words[i])) {
+      return true;
+    } else {
+      return false;
     }
-  return false
+  }
+  return false;
 }
 
 app.post("/post/:id/comment", (req, res) => {
   let id = req.params.id;
   let ayar = req.body;
   if (ayar.name !== "Anıl" && yorumK(ayar.comment)) {
-    res.send("Yorumunuzda küfür tespit edilmiştir. Toplum kurallarına uyarak yorum paylaşmanızı şiddetle tavsiye ediyorum.") 
-    hh(`[BLOG-POST-ZEROAI] - "${id}" id'li post'a küfürlü yorum paylaşıldı. Ve ZeroBOT tarafından engellendi.`)
-    db.add("ek", +1)
+    res.send(
+      "Yorumunuzda küfür tespit edilmiştir. Toplum kurallarına uyarak yorum paylaşmanızı şiddetle tavsiye ediyorum."
+    );
+    hh(messages.zeroai.comment_badwords_found.replace("{id}", id));
+    db.add("ek", +1);
     db.push(`post.${id}.comments`, {
       name: "ZBT",
       comment: `"${ayar.name}" tarafından paylaşılan kişinin kural dışı yorumu engellendi.`,
       date: Date.now(),
-  });
+    });
   } else {
-  db.push(`post.${id}.comments`, {
-    name: ayar.name,
-    comment: ayar.comment,
-    date: Date.now(),
-  });
-  hh(`[BLOG-POST] - "${id}" id'li post'a yorum yapıldı!`);
-  // Bildirim olayını yay
-  io.emit('notification', {
-    postId: id,
-    name: ayar.name
-  });
-  res.redirect(`/post/${id}`);
+    db.push(`post.${id}.comments`, {
+      name: ayar.name,
+      comment: ayar.comment,
+      date: Date.now(),
+    });
+    hh(messages.success.post_comment_published.replace("{id}", id));
+    // Bildirim olayını yay
+    io.emit("notification", {
+      postId: id,
+      name: ayar.name,
+    });
+    res.redirect(`/post/${id}`);
   }
 });
 
@@ -376,7 +387,7 @@ app.get("/post/:id/edit", async function (req, res) {
   if (checkAuth(req, res)) {
     yukle(res, req, "post-edit.ejs", { id });
   } else {
-    hh(`[SISTEM] - "/post/edit" sayfasına yetkisiz giriş yapılmaya çalışıldı.`);
+    hh(messages.fail.unauthorized_postedit);
     res.status(401).send("Insufficient permissions.");
   }
 });
@@ -395,7 +406,7 @@ app.post("/post/:id/edit", async function (req, res) {
       edited: true,
       likes: veri.likes,
     },
-    hh(`[BLOG] - "${req.body.title}" Post Düzenlendi.`)
+    hh(messages.success.post_edited.replace("{title}", req.body.title))
   );
   res.status(200).redirect("/");
 });
@@ -404,9 +415,7 @@ app.get("/postkaldir", async function (req, res) {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-postkaldir.ejs");
   } else {
-    hh(
-      `[SISTEM] - "/postkaldir" sayfasına yetkisiz giriş yapılmaya çalışıldı.`
-    );
+    hh(messages.fail.unauthorized_postdelete);
     res.status(401).send("Insufficient permissions.");
   }
 });
@@ -414,7 +423,7 @@ app.get("/postkaldir", async function (req, res) {
 app.post("/postkaldir", async function (req, res) {
   let ayar = req.body;
   db.delete("post." + ayar["postId"]);
-  hh(`[BLOG] - "${ayar.postId}" Post Kaldırıldı`);
+  hh(messages.success.post_deleted.replace("{postId}", ayar.postId));
   res.status(200).redirect("/postlar");
 });
 
@@ -445,7 +454,7 @@ app.get("/link/ekle", async function (req, res) {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-linkekle.ejs");
   } else {
-    hh(`[SISTEM] - "/link/ekle" sayfasına yetkisiz giriş yapılmaya çalışıldı.`);
+    hh(messages.fail.unauthorized_linkadd);
     res.status(401).send("Insufficient permissions.");
   }
 });
@@ -455,7 +464,7 @@ app.post("/link/ekle", (req, res) => {
   var url1 = generateApiKey();
 
   if (!ayar)
-    return hh(`[LINK] - Link sistemi hatalı kullanıldı.`).then(() =>
+    return hh(messages.link_used_wrong).then(() =>
       res.status(404).send("Link girilmedi.")
     );
   else {
@@ -464,7 +473,7 @@ app.post("/link/ekle", (req, res) => {
       href: ayar,
       date: Date.now(),
     });
-    hh(`[LINK] - Link sistemine yeni link eklendi! [${url1}]`);
+    hh(messages.success.link_added.replace("{url1}", url1));
   }
 });
 
@@ -472,9 +481,7 @@ app.get("/link/listele", (req, res) => {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-linkliste.ejs");
   } else {
-    hh(
-      `[SISTEM] - "/link/liste" sayfasına yetkisiz giriş yapılmaya çalışıldı.`
-    );
+    hh(messages.fail.unauthorized_linklist);
     res.status(401).send("Insufficient permissions.");
   }
 });
@@ -482,23 +489,21 @@ app.get("/link/listele", (req, res) => {
 app.post("/link/listele", (req, res) => {
   var ayar = req.body.link;
   if (!ayar) {
-    hh(`[LINK] - Link sistemi hatalı kullanıldı!`);
+    hh(messages.link_used_wrong);
     res.status(404).send("Bu hatalı bir link anahtarıdır.");
   } else {
     db.delete("link." + ayar);
-    hh(`[LINK] - Link sisteminden "${ayar}" anahtarlı link kaldırıldı!`);
+    hh(messages.success.link_deleted.replace("{ayar}", ayar));
   }
 });
 app.get("/link/:id", (req, res) => {
   let ayar = req.params.id; // Değiştirilen kısım
   let veri = db.get(`link.${ayar}`);
   if (veri) {
-    hh(`[LINK] - Link sistemi kullanıldı! [${ayar}]`);
+    hh(messages.link_used.replace("{ayar}", ayar));
     yukle(res, req, "yonlendirme.ejs", { link: veri.href, url: ayar });
   } else {
-    hh(
-      `[LINK] - Link sistemi geçerli olmayan bir veri ile kullanıldı! [${ayar}]`
-    );
+    hh(messages.fail.invailed_link.replace("{ayar}", ayar));
     res.status(404).send("Bu link geçerli değildir");
   }
 });
@@ -507,12 +512,10 @@ app.post("/link/:id", (req, res) => {
   let ayar = req.params.id; // Değiştirilen kısım
   let veri = db.get(`link.${ayar}`);
   if (veri) {
-    hh(`[LINK] - Link sisteminde bir kişi yönlendirildi! [${ayar}]`);
+    hh(messages.routed_link.replace("{ayar}", ayar));
     res.redirect(veri.href);
   } else {
-    hh(
-      `[LINK] - Link sistemi geçerli olmayan bir veri ile kullanıldı! [${ayar}]`
-    );
+    hh(messages.fail.invailed_link.replace("{ayar}", ayar));
     res.status(404).send("Bu link geçerli değildir");
   }
 });
@@ -542,26 +545,11 @@ app.get("/api", async function (req, res) {
   }
 });
 
-// Spotify API'ye erişmek için kullanılacak token
-
-// Şarkı arama get isteği
-
-app.get("/spotify", async (req, res) => {
-  if (checkAuth(req, res)) {
-    yukle(res, req, "spotify.ejs");
-  } else {
-    hh(`[SISTEM] - "/spotify" sayfasına yetkisiz giriş yapılmaya çalışıldı.`);
-    res.status(401).send("Insufficient permissions.");
-  }
-});
-
 app.get("/api/keygen", async function (req, res) {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-key.ejs");
   } else {
-    hh(
-      `[SISTEM] - "/api/keygen" sayfasına yetkisiz giriş yapılmaya çalışıldı.`
-    );
+    hh(messages.fail.unauthorized_keygen);
     res.status(401).redirect("/404");
   }
 });
@@ -597,7 +585,7 @@ app.post("/api/keygen", async function (req, res) {
       key: apiKey,
     });
 
-    hh(`[API] - "${apiKey}" Anahtar Oluşturuldu.`);
+    hh(messages.success.api_key_create.replace("{apiKey}", apiKey));
     // Anahtar başarıyla oluşturulduğunda istemciye yanıt gönder
     res.status(200).redirect("/api/keyliste");
   } catch (error) {
@@ -641,7 +629,7 @@ function checkApiKey(apiKey) {
       if (currentTime > expiryTime) {
         // Anahtarın süresi dolmuşsa false döndür
         console.log("API Key invalid: Expired");
-        hh(`[API] - ${apiKey} Anahtarının kullanım süresi sona erdi.`);
+        hh(messages.api_key_expired.replace("{apiKey}", apiKey));
         return { valid: false, permission: null };
       }
     }
@@ -659,9 +647,7 @@ app.get("/api/keyliste", async (req, res) => {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-keyliste.ejs");
   } else {
-    hh(
-      `[SISTEM] - "/api/keyliste" sayfasına yetkisiz giriş yapılmaya çalışıldı.`
-    );
+    hh(messages.fail.unauthorized_keylist);
     res.status(401).redirect("/404");
   }
 });
@@ -669,7 +655,7 @@ app.get("/api/keyliste", async (req, res) => {
 app.post("/api/keykaldir", async function (req, res) {
   let ayar = req.body;
   db.delete("key." + ayar["apiKey"]);
-  hh(`[API] - "${ayar.apiKey}" Anahtar Kaldırıldı.`);
+  hh(messages.success.api_key_delete.replace("{apiKey}", ayar.apiKey));
   res.status(200).redirect("/api/keyliste");
 });
 
@@ -694,13 +680,9 @@ app.get("/api/postveri/:id", async (req, res) => {
           yorumSayı: yorumSayi,
           yorumlar: "Yorumları görüntüleme izniniz bulunmamaktadır.",
         });
-        hh(
-          `[API-SISTEM] - "/api/postveri" sistemi başarıyla tam yetkili olmayan bir anahtar ile kullanıldı! "${key}"`
-        );
+        hh(messages.fail.unauthorized_key.replace("{key}", key));
       } else {
-        hh(
-          `[API-SISTEM] - "/api/postveri" sistemine geçersiz api anahtarı ile giriş yapılmaya çalışıldı. ${key}`
-        );
+        hh(messages.fail.invailed_key.replace("{key}", key));
         res.status(404).send("Böyle post kimliği bulunamadı");
       }
     } else if (apiData.permission === "admin") {
@@ -713,19 +695,13 @@ app.get("/api/postveri/:id", async (req, res) => {
           yorumSayı: yorumSayi,
           yorumlar: Object.values(veri.comments),
         });
-        hh(
-          `[API-SISTEM] - "/api/postveri" sistemi başarıyla tam yetkili bir anahtar ile kullanıldı! "${key}"`
-        );
+        hh(messages.success.authorized_key_used.replace("{key}", key));
       } else {
-        hh(
-          `[API-SISTEM] - "/api/postveri" sistemine geçersiz api anahtarı ile giriş yapılmaya çalışıldı. ${key}`
-        );
+        hh(messages.fail.invailed_key.replace("{key}", key));
         res.status(404).send("Böyle post kimliği bulunamadı");
       }
     } else {
-      hh(
-        `[API-SISTEM] - "/api/postveri" sistemine yetkisiz giriş yapılmaya çalışıldı. ${key}`
-      );
+      hh(messages.fail.unauthorized_key.replace("{key}", key));
       res
         .status(401)
         .send(
@@ -733,9 +709,7 @@ app.get("/api/postveri/:id", async (req, res) => {
         );
     }
   } else {
-    hh(
-      `[API-SISTEM] - "/api/postveri" sistemine süresi bitmiş bir api anahtarı ile giriş yapılmaya çalışıldı. ${key}`
-    );
+    hh(messages.fail.expired_key.replace("{key}", key));
     res.status(203).redirect("/404");
   }
 });
@@ -779,24 +753,18 @@ app.get("/api/link/:id", async (req, res) => {
   if (apiData.valid) {
     if (apiData.permission === "okuma" || apiData.permission === "admin") {
       if (veri) {
-        hh(
-          `[API-SISTEM] - "/api/link/:id" sistemi Başarıyla veri çekildi! API Key: ${key}`
-        );
+        hh(messages.success.api_key_used.replace("{key}", key));
         res.status(200).json({
           yonlendirme: veri.href,
           url: veri.url,
           tarih: veri.date,
         });
       } else {
-        hh(
-          `[API-SISTEM] - "/api/link/:id" sistemine geçersiz api anahtarı ile giriş yapılmaya çalışıldı. ${key}`
-        );
+        hh(messages.fail.invailed_key.replace("{key}", key));
         res.status(404).send("Böyle post kimliği bulunamadı");
       }
     } else {
-      hh(
-        `[API-SISTEM] - "/api/link/:id" sistemine yetkisiz giriş yapılmaya çalışıldı. ${key}`
-      );
+      hh(messages.fail.unauthorized_key.replace("{key}", key));
       res
         .status(401)
         .send(
@@ -804,9 +772,7 @@ app.get("/api/link/:id", async (req, res) => {
         );
     }
   } else {
-    hh(
-      `[API-SISTEM] - "/api/link/:id" sistemine süresi bitmiş bir api anahtarı ile giriş yapılmaya çalışıldı. ${key}`
-    );
+    hh(messages.fail.expired_key.replace("{key}", key));
     res
       .status(203)
       .send(
@@ -818,5 +784,5 @@ app.get("/api/link/:id", async (req, res) => {
 //-----------------------------[API bitis]-----------------------------------------]
 
 app.listen(ayarlar.port, () => {
-  xariona.info("Yelkenler açıldı başkan! Proje hazır");
+  xariona.info(messages.boot);
 });
