@@ -157,66 +157,114 @@
     Bu sayfada <strong>senin paylaştığın</strong> yazıtlar mevcuttur bunları incelemek kaldırmak isterseniz lütfen <strong>post kimliğini</strong> kopyalayıp gerekli işlemi yapmak istediğinizde admin panelinden gerekli sayfalara geçiniz. Veyahut <strong> yandaki butonları </strong> kullanınız
   </div>
 <div>
-  <% if (db.get("post")) { %>
-    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-      <thead>
-        <th><abbr title="Kimliği">Post Kimliği</abbr></th>
-        <th><abbr title="Başlık">Post Başlığı</abbr></th>
-        <th><abbr title="Başlık">Post Beğeni</abbr></th>
-        <th><abbr title="Başlık">Post Yorum</abbr></th>
-      </thead>
-      <tbody>
-        <% let postlar = db.get("post") %>
-        <% Object.keys(postlar).forEach(post => { %>
-          <% var post2 = db.get("post." + post) %>
+<% if (db.get("post")) { %>
+  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+      <th><abbr title="Kimliği">Post Kimliği</abbr></th>
+      <th><abbr title="Başlık">Post Başlığı</abbr></th>
+      <th><abbr title="Beğeni">Post Beğeni</abbr></th>
+      <th><abbr title="Yorum">Post Yorum</abbr></th>
+    </thead>
+    <tbody>
+      <% let postlar = db.get("post") %>
+      <% Object.keys(postlar).forEach(post => { %>
+        <% var post2 = db.get("post." + post) %>
+        <% if (!post2.archived) { %> <!-- Sadece arşivlenmemiş postları göster -->
           <tr>
             <td><%= post %></td>
             <td><%= post2.title %></td>
-            <td><%=post2.likes%></td>
+            <td><%= post2.likes %></td>
             <td><%= post2.comments ? Object.keys(post2.comments).length : 0 %></td>
             <td>
-              <button class="button is-danger is-light is-small" onclick="kaldır(`<%= post %>`)"> <!-- Kaldır butonu -->
+              <button class="button is-danger is-light is-small" onclick="kaldır('<%= post %>')">
                 <span class="icon">
                   <i class="fas fa-trash-alt"></i>
                 </span>
               </button>
-              <button class="button is-info is-light is-small" style="color:black" onclick="edit(`<%= post %>`)">
+              <button class="button is-info is-light is-small" style="color:black" onclick="edit('<%= post %>')">
                 <span class="icon">
-                  <i class="fas fa-edit"></i> <!-- Edit icon -->   
+                  <i class="fas fa-edit"></i>
                 </span>
               </button>
-              <button class="button is-success is-light is-small" onclick="copy(`https://anil-blog.glitch.me/post/<%= post %>`)" >
+              <button class="button is-success is-light is-small" onclick="copy('https://anil-blog.glitch.me/post/<%= post %>')">
                 <span class="icon">
                   <i class="fas fa-file"></i>
                 </span>
               </button>
-              <button class="button is-warning is-light is-small" onclick="send(`<%= post %>`)" >
+              <button class="button is-warning is-light is-small" onclick="send('<%= post %>')">
                 <span class="icon">
                   <i class="fas fa-paper-plane"></i>
                 </span>
               </button>
-              <button class="button is-info is-light is-small" onclick="comment(`<%= post %>`)" >
+              <button class="button is-info is-light is-small" onclick="comment('<%= post %>')">
                 <span class="icon">
                   <i class="fa fa-comment"></i>
                 </span>
               </button>
+              <button class="button is-light is-small" style="background-color: #00FF00;" onclick="archive('<%= post %>')">
+                <span class="icon">
+                  <i class="fas fa-archive"></i>
+                </span>
+              </button>
             </td>
           </tr>
-        <% }) %>
-      </tbody>
-    </table>
+        <% } %> <!-- Arşivlenmiş postlar bu if bloğunun dışında kalır -->
+      <% }) %>
+    </tbody>
+  </table>
 
-  <% } else { %>
-     <center><h4 class"title is-4">
-       <strong style="color:blue">Görüntülenecek herhangi bir post bulunmamaktadır.</strong>
-       </h4></center>
-  <% } %>
+<% } else { %>
+  <center>
+    <h4 class="title is-4">
+      <strong style="color:blue">Görüntülenecek herhangi bir post bulunmamaktadır.</strong>
+    </h4>
+  </center>
+<% } %>
+
 <button class="button is-primary fancy-button" onclick="post()">
   <span class="icon">
     <i class="fas fa-plus"></i>
   </span>
   <span>Yeni Post Ekle</span>
 </button>
+<h4 class="title is-4" style="margin-top: 40px;">Arşivlenmiş Postlar</h4>
+    <% let postlar = db.get("post") %>
+<% if (Object.keys(postlar).some(post => postlar[post].archived)) { %>
+  <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+      <th><abbr title="Kimliği">Post Kimliği</abbr></th>
+      <th><abbr title="Başlık">Post Başlığı</abbr></th>
+      <th><abbr title="Beğeni">Post Beğeni</abbr></th>
+      <th><abbr title="Yorum">Post Yorum</abbr></th>
+    </thead>
+    <tbody>
+      <% Object.keys(postlar).forEach(post => { %>
+        <% var post2 = db.get("post." + post) %>
+        <% if (post2.archived === true) { %>
+          <tr>
+            <td><%= post %></td>
+            <td><%= post2.title %></td>
+            <td><%= post2.likes %></td>
+            <td><%= post2.comments ? Object.keys(post2.comments).length : 0 %></td>
+            <td>
+              <button class="button is-light is-small" style="background-color: red;" onclick="unarchive('<%= post %>')">
+                <span class="icon">
+                  <i class="fas fa-box-open"></i>
+                </span>
+              </button>
+            </td>
+          </tr>
+        <% } %>
+      <% }) %>
+    </tbody>
+  </table>
+<% } else { %>
+  <center>
+    <h4 class="title is-4">
+      <strong style="color:red">Görüntülenecek arşivlenmiş post bulunmamaktadır.</strong>
+    </h4>
+  </center>
+<% } %>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.1.4/sweetalert2.min.js"></script>
@@ -264,6 +312,25 @@ function copy(url) {
   document.body.removeChild(input);
       
   alert("URL Başarıyla kopyalandı. " + url)
+}
+function archive(postID) {
+  axios.post('/postarchive', { postId: postID })
+    .then(function(response) {
+      location.reload();
+    })
+    .catch(function(error) {
+      console.error('Post arşivlenemedi:', error);
+    });
+}
+
+function unarchive(postID) {
+  axios.post('/postarchive', { postId: postID })
+    .then(function(response) {
+      location.reload();
+    })
+    .catch(function(error) {
+      console.error('Post arşivden çıkarılamadı:', error);
+    });
 }
 </script>
 </body>
@@ -346,6 +413,9 @@ window.onload = function() {
 </script>
 
 <style>
+  .archived-post {
+    background-color: #ffe6e6 !important; /* Hafif kırmızı arka plan rengi */
+  }
 nav .navbar-dropdown {
     border-top: none;
 }
