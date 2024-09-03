@@ -1,35 +1,38 @@
 <%- include('header.ejs') %>
-<div class="container">
+<div class="container mt-5">
   <section class="articles">
     <div class="columns is-multiline">
       <% let posts = db.get("post"); %>
       <% if (posts) { %>
         <% Object.keys(posts).forEach(key => { %>
           <% let post = db.get("post." + key); %>
-          <div class="column is-one-third">
-            <div class="card article">
-              <div class="card-content">
-                <div class="media">
-                  <div class="media-left">
-                  </div>
-                  <div class="media-content">
-                    <p class="title article-title"><a style="color:black" href="/post/<%= key %>"><%= post.title %></a></p>
-                    <div class="tags has-addons level-item">
-                      <span class="tag is-rounded is-info"><i class="fas fa-user"></i>- <%= post.author %></span>
-                      <span class="tag is-rounded"><%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }) %> - <i class="far fa-calendar-alt"></i></span>
-                    </div>
-                    <div class="content article-body">
-                      <% if (post.desc.length > 15) { %>
-                        <p><%= post.desc.substring(0, 15) %>...</p>
-                      <% } else { %>
-                        <p><%= post.desc %></p>
-                      <% } %>
+          <% if (!post.archived) { %> <!-- Arşivlenmemiş postları göster -->
+            <div class="column is-one-third">
+              <div class="card article modern-card">
+                <div class="card-image">
+                  <% if (post.image) { %>
+                    <figure class="image is-4by3">
+                      <img src="<%= post.image %>" alt="<%= post.title %>">
+                    </figure>
+                  <% } %>
+                </div>
+                <div class="card-content">
+                  <div class="media">
+                    <div class="media-content">
+                      <p class="title article-title"><a href="/post/<%= key %>"><%= post.title %></a></p>
+                      <div class="tags has-addons level-item">
+                        <span class="tag is-rounded is-info"><i class="fas fa-user"></i> <%= post.author %></span>
+                        <span class="tag is-rounded"><i class="far fa-calendar-alt"></i> <%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+                      </div>
+                      <div class="content article-body">
+                        <p><%= post.desc.length > 50 ? post.desc.substring(0, 50) + '...' : post.desc %></p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          <% } %> <!-- Arşivlenmiş postlar bu if bloğunun dışında kalır -->
         <% }); %>
       <% } %>
     </div>
@@ -38,33 +41,55 @@
 <%- include('footer.ejs') %>
 
 <style>
-  /* Existing styles... */
-
-  /* New styles for side-by-side alignment and title centering */
-  .media {
-    display: flex; /* Make media container a flexbox */
+  /* Genel stil */
+  body {
+    background-color: #f5f5f5;
+    color: #4a4a4a;
+    font-family: 'Roboto', sans-serif;
   }
 
-  .media-left {
-    flex: 0 0 auto; /* Set fixed width for image (optional) */
-    margin-right: 10px; /* Add spacing between image and text */
+  /* Modern kart stili */
+  .modern-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
-  .media-content {
-    flex: 1 1 auto; /* Allow text content to grow */
-    display: flex; /* Make content container a flexbox for vertical alignment */
-    flex-direction: column; /* Stack elements vertically */
-    justify-content: center; /* Vertically center content within media-content */
-    align-items: center; /* Horizontally center content within media-content */
+  .modern-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
   }
 
-  .article-title {
-    text-align: center; /* Center title text within the card */
+  .modern-card .card-image img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
   }
 
-  .author {
-    /* Additional styles for author name (optional) */
-    margin-top: 5px; /* Add some space above author name */
-    font-size: 14px; /* Adjust font size for author name */
+  .article-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .article-title a:hover {
+    color: #3273dc;
+  }
+
+  .tags .tag {
+    background-color: #3273dc;
+    color: #fff;
+    border-radius: 20px;
+    padding: 5px 10px;
+  }
+
+  .tags .tag.is-info {
+    background-color: #209cee;
+  }
+
+  .article-body {
+    font-size: 14px;
+    line-height: 1.6;
   }
 </style>
