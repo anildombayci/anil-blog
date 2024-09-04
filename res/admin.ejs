@@ -63,9 +63,72 @@
             </div>
         </div>
     </div>
-</nav>
-        <!-- END NAV -->
+    <!--<div class="notification">
+        <span class="badge" id="notificationCount">0</span>
+        <i class="fa fa-bell"></i>
+    </div>
+    <div class="notification-popup" id="notificationPopup">
+        <h3>Bildirimler</h3>
+        <div id="notificationList">
 
+        </div>
+    </div>-->
+</nav>
+    <style>
+        /* Genel stil */
+        .notification {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            padding: 8px;
+            background-color: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center; /* İçeriği ortala */
+            width: 40px; /* Genişlik ayarı */
+            height: 40px; /* Yükseklik ayarı */
+        }
+        .notification .badge {
+            position: absolute;
+            top: 5px;
+            right: 0.3px;
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            font-size: 12px;
+            padding: 3px 6px;
+        }
+        .fa-bell {
+            font-size: 22px; /* Zil simgesinin boyutu */
+            color: #555;
+            margin-top: 5px; /* Zil simgesi biraz ortalanmış gibi görünsün */
+        }
+        /* Bildirim popup */
+        .notification-popup {
+            position: fixed;
+            top: 50px;
+            right: 20px;
+            width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            display: none; /* Başlangıçta gizli */
+            z-index: 1000;
+            padding: 10px;
+        }
+        .notification-popup h3 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        .notification-popup p {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+        <!-- END NAV -->
         <div class="columns" id="app-content">
             <div class="column is-2 is-fullheight is-hidden-touch" id="sidebar">
     <aside class="menu">
@@ -202,11 +265,16 @@
                         </span>
                     </div>
                     <div class="quick-stats-content">
-                        <h3 class="title is-4">Yayınlanmış Post</h3>
-                        <h3 class="title is-4"><%= db.get("post") ? Object.keys(db.get("post")).length : 0 %></p>
+                        <h3 class="title is-4">Yayınlanmış Post / Arşivlenmiş Post</h3>
+                        <h3 class="title is-4"><%= db.get("post") 
+              ? Object.values(db.get("post")).filter(post => !post.archived).length 
+              : 0 %> / 
+        <%= db.get("post") 
+              ? Object.values(db.get("post")).filter(post => post.archived).length 
+              : 0 %></h3>
                         <div class="inlinesparkline-bar"></div>
                     </div>
-                </div>
+                  </div>
                 <div class="box quick-stats has-background-warning has-text-white">
                     <div class="quick-stats-icon">
                         <span class="icon is-large">
@@ -225,9 +293,21 @@
                             <i class="fa fa-3x fa-globe"></i>
                         </span>
                     </div>
+                  <div class="quick-stats-content">
+                      <h3 class="title is-4">ZeroBOT Yenilenme Süresi</h3>
+                      <h3 class="title is-4" id="timer">BU KISIMIN ÇALIŞMASI İÇİN LÜTFEN CSP BLOKE KALDIRICISINI AÇINIZ</h3>
+                      <div class="inlinesparkline-bar"></div>
+                  </div>
+                </div>
+                <div class="box quick-stats has-background-link has-text-white">
+                    <div class="quick-stats-icon"> 
+                        <span class="icon is-large">
+                            <i class="fa fa-3x fa-ban"></i>
+                        </span>
+                    </div>
                     <div class="quick-stats-content">
-                        <h3 class="title is-4">Kayıtlı Yönlendirme Link</h3>
-                        <h3 class="title is-4"><%= db.get("link") ? Object.keys(db.get("link")).length : 0 %></p>
+                        <h3 class="title is-4">Zero BOT Engellenen Küfür</h3>
+                        <h3 class="title is-4"><%= db.get("ek") ? db.get("ek") : 0 %></p>
                         <div class="inlinesparkline-bar"></div>
                     </div>
                 </div>
@@ -248,6 +328,37 @@
 </html>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    const intervalDuration = 300; // 120 saniye (2 dakika)
+
+    function startTimer(startTime) {
+        const intervalDurationInMillis = intervalDuration * 1000;
+
+        function updateTimer() {
+            const currentTime = Date.now();
+            let elapsed = Math.floor((currentTime - startTime) / 1000);
+            let remainingTime = intervalDuration - (elapsed % intervalDuration);
+
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+
+            document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        updateTimer(); // Timer'ı hemen güncelle
+        setInterval(updateTimer, 1000); // Her saniyede bir timer güncellenir
+    }
+
+    // Backend'den başlangıç zamanını al
+    axios.get('/api/start-time')
+        .then(response => {
+            const startTime = response.data.startTime;
+            startTimer(startTime);
+        })
+        .catch(error => {
+            console.error('Başlangıç zamanı alınamadı:', error);
+        });
+</script>
 <script>
 function temizle() {
   axios.get("/admin/sht").then(response => {
