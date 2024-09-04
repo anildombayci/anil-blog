@@ -46,7 +46,7 @@ app.use(
 moment.tz.setDefault("Europe/Istanbul");
 moment.locale("tr");
 
-const users = [{ id: 1, username: "admin", password: "anil1542" }];
+const users = [{ id: 1, username: "admin", password: "1234" }];
 
 // Passport'ın başlatılması ve oturum desteği eklenmesi
 app.use(passport.initialize());
