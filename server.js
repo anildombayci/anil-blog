@@ -316,7 +316,7 @@ app.post("/postlar/:id/yorumlar", async function (req, res) {
   let veri = db.get(`post.${id}.comments`);
   let tarih = parseInt(req.body.date); // Tarih değerini sayıya çevirme
   let veri2;
-  veri2 = veri.filter((x) => x.date !== tarih); // Tarihi sayıya çevirdik; // Filtrelenmiş veriyi konsola yazdırma
+  veri2 = veri.filter((x) => x.date !== tarih); // Tarihi sayıya çevirdik;
   db.set(`post.${id}.comments`, veri2);
   hh(
     messages.post_comment_deleted
@@ -339,14 +339,29 @@ app.post("/post/:id", (req, res) => {
   res.status(200).send(true);
 });
 
+let fs = require("fs");
+let küfürler = require("./extras/küfürler.json");
+let startTime = Date.now(); // Backend tarafında başlangıç zamanı
+
+// Küfür listesini yenileyen fonksiyon
+function küfürListesiniYenile() {
+  küfürler = JSON.parse(fs.readFileSync("./extras/küfürler.json", "utf8"));
+  startTime = Date.now(); // Yenileme anında zaman güncelle
+  hh(messages.zeroai.badwords_protect_update)
+}
+
+// Her 5 dakikada bir küfür listesini yenile
+setInterval(küfürListesiniYenile, 300000); // 300000 milisaniye = 5 dakika
+
+app.get("/api/start-time", (req, res) => {
+  res.json({ startTime: startTime });
+});
+
 function yorumK(y) {
-  let küfürler = require("./extras/küfürler.json");
   let words = y.toLowerCase().split(/\s+/);
   for (let i = 0; i < words.length; i++) {
     if (küfürler.includes(words[i])) {
       return true;
-    } else {
-      return false;
     }
   }
   return false;
@@ -373,11 +388,6 @@ app.post("/post/:id/comment", (req, res) => {
       date: Date.now(),
     });
     hh(messages.success.post_comment_published.replace("{id}", id));
-    // Bildirim olayını yay
-    io.emit("notification", {
-      postId: id,
-      name: ayar.name,
-    });
     res.redirect(`/post/${id}`);
   }
 });
@@ -785,4 +795,5 @@ app.get("/api/link/:id", async (req, res) => {
 
 app.listen(ayarlar.port, () => {
   xariona.info(messages.boot);
+  küfürListesiniYenile();
 });
