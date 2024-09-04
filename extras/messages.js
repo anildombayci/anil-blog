@@ -14,12 +14,12 @@ let messages = {
       unauthorized_keygen: `[SISTEM] - "/api/keygen" sayfasına yetkisiz giriş yapılmaya çalışıldı.`,
       unauthorized_keylist: `[SISTEM] - "/api/keyliste" sayfasına yetkisiz giriş yapılmaya çalışıldı.`,
       unauthorized_key: `[API-SISTEM] - "/api/postveri" sistemi başarıyla tam yetkili olmayan bir anahtar ile kullanıldı! "{key}"`,
-      invailed_key: `[API-SISTEM] - "/api/postveri" sistemine geçersiz api anahtarı ile giriş yapılmaya çalışıldı. {key}`,
-      expired_key: `[API-SISTEM] - "/api/postveri" sistemine süresi bitmiş bir api anahtarı ile giriş yapılmaya çalışıldı. {key}`
+      invailed_key: `[API-SISTEM] - "/api/postveri" sistemine geçersiz api anahtarı ile giriş yapılmaya çalışıldı. "{key}"`,
+      expired_key: `[API-SISTEM] - "/api/postveri" sistemine süresi bitmiş bir api anahtarı ile giriş yapılmaya çalışıldı. "{key}"`
     },
     post_archive: {
-      archived: `{postId} ID'sine sahip POST "Anıl Bey" tarafından Arşivlendi.`,
-      unarchived: `{postId} ID'sine sahip POST "Anıl Bey" tarafından Arşivden kaldırıldı.`
+      archived: `[BLOG] - "{postId}" ID'sine sahip POST "Anıl Bey" tarafından Arşivlendi.`,
+      unarchived: `[BLOG] - "{postId}" ID'sine sahip POST "Anıl Bey" tarafından Arşivden kaldırıldı.`
     },
     success: {
       post_published_archived: `[BLOG] - "{title}" yazıt başlığına sahip "{date2}" anahtarına sahip yazıt ARŞİVLENMİŞ bir şekilde başarıyla yayınlandı!`,
@@ -30,13 +30,14 @@ let messages = {
       post_deleted: `[BLOG] - "{postId}" Post Kaldırıldı`,
       link_added: `[LINK] - Link sistemine yeni link eklendi! {url1}`,
       link_deleted: `[LINK] - Link sisteminden "{ayar}" anahtarlı link kaldırıldı!`,
-      api_key_create: `[API] - {apiKey}" Anahtar Oluşturuldu.`,
+      api_key_create: `[API] - "{apiKey}" Anahtar Oluşturuldu.`,
       api_key_delete: `[API] - "{apiKey}" Anahtar Kaldırıldı.`,
       authorized_key_used: `[API-SISTEM] - "/api/postveri" sistemi başarıyla tam yetkili bir anahtar ile kullanıldı! "{key}"`,
-      api_key_used: `[API-SISTEM] - "/api/link/:id" sistemi Başarıyla veri çekildi! API Key: {key}`
+      api_key_used: `[API-SISTEM] - "/api/link/:id" sistemi Başarıyla veri çekildi! API Key: "{key}"`
     },
     zeroai: {
-      comment_badwords_found: `[BLOG-POST-ZEROAI] - "{id}" id'li post'a küfürlü yorum paylaşıldı. Ve ZeroBOT tarafından engellendi.`
+      comment_badwords_found: `[BLOG-POST-ZEROAI] - "{id}" id'li post'a küfürlü yorum paylaşıldı. Ve ZeroBOT tarafından engellendi.`,
+      badwords_protect_update: `[ZEROAI-SYSTEM-BOOT] - ZeroBOT Küfür koruma sistemi güncellendi. Ve aktif edildi!`
     },
     link_used_wrong: `[LINK] - Link sistemi hatalı kullanıldı.`,
     link_used: `[LINK] - Link sistemi kullanıldı! {ayar}`,
