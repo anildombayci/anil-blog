@@ -170,7 +170,10 @@
       <% Object.keys(postlar).forEach(post => { %>
         <% var post2 = db.get("post." + post) %>
         <% if (!post2.archived) { %> <!-- Sadece arşivlenmemiş postları göster -->
-          <tr>
+          <tr 
+              class="post-row"
+              onmouseover="showPreview('<%= post2.title %>', '<%= post2.content %>', '<%= post2.likes %>', event)"
+              onmouseout="hidePreview()">
             <td><%= post %></td>
             <td><%= post2.title %></td>
             <td><%= post2.likes %></td>
@@ -208,11 +211,10 @@
               </button>
             </td>
           </tr>
-        <% } %> <!-- Arşivlenmiş postlar bu if bloğunun dışında kalır -->
+        <% } %>
       <% }) %>
     </tbody>
   </table>
-
 <% } else { %>
   <center>
     <h4 class="title is-4">
@@ -220,6 +222,13 @@
     </h4>
   </center>
 <% } %>
+
+<!-- Popup Box İçeriği -->
+<div id="post-preview" class="post-preview-box" style="display:none;">
+  <h5 id="preview-title"></h5>
+  <p id="preview-content"></p>
+  <p id="preview-likes" class="likes-info"></p>
+</div>
 
 <button class="button is-primary fancy-button" onclick="post()">
   <span class="icon">
@@ -332,6 +341,21 @@ function unarchive(postID) {
       console.error('Post arşivden çıkarılamadı:', error);
     });
 }
+function showPreview(title, content, likes, event) {
+  const preview = document.getElementById('post-preview');
+  document.getElementById('preview-title').textContent = title;
+  document.getElementById('preview-content').textContent = content;
+  document.getElementById('preview-likes').textContent = `Beğeniler: ${likes}`;
+  
+  preview.style.display = 'block';
+  preview.style.top = `${event.clientY + 10}px`; // Mouse konumuna göre yerleştir
+  preview.style.left = `${event.clientX + 10}px`;
+}
+
+function hidePreview() {
+  const preview = document.getElementById('post-preview');
+  preview.style.display = 'none';
+}
 </script>
 </body>
 <script>
@@ -413,6 +437,34 @@ window.onload = function() {
 </script>
 
 <style>
+.post-preview-box {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 250px;
+  font-size: 14px;
+  z-index: 1000;
+}
+
+#preview-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+#preview-content {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.likes-info {
+  font-size: 13px;
+  color: #888;
+}
   .archived-post {
     background-color: #ffe6e6 !important; /* Hafif kırmızı arka plan rengi */
   }
