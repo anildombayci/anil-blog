@@ -348,8 +348,29 @@ function showPreview(title, content, likes, event) {
   document.getElementById('preview-likes').textContent = `Beğeniler: ${likes}`;
   
   preview.style.display = 'block';
-  preview.style.top = `${event.clientY + 10}px`; // Mouse konumuna göre yerleştir
-  preview.style.left = `${event.clientX + 10}px`;
+
+  // Varsayılan konum
+  let top = event.clientY + 10;
+  let left = event.clientX + 10;
+
+  // Ekranın sınırlarını kontrol et
+  const previewWidth = preview.offsetWidth;
+  const previewHeight = preview.offsetHeight;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+
+  // Sağ tarafa taşarsa
+  if (left + previewWidth > screenWidth) {
+    left = screenWidth - previewWidth - 10; // Kutuyu ekran içinde tutmak için geri çek
+  }
+
+  // Alt tarafa taşarsa
+  if (top + previewHeight > screenHeight) {
+    top = screenHeight - previewHeight - 10; // Kutuyu ekran içinde tutmak için geri çek
+  }
+
+  preview.style.top = `${top}px`;
+  preview.style.left = `${left}px`;
 }
 
 function hidePreview() {
