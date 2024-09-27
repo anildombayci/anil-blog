@@ -46,7 +46,7 @@ app.use(
 moment.tz.setDefault("Europe/Istanbul");
 moment.locale("tr");
 
-const users = [{ id: 1, username: "admin", password: "1234" }];
+const users = [{ id: 1, username: "admin", password: "anil1542" }];
 
 // Passport'ın başlatılması ve oturum desteği eklenmesi
 app.use(passport.initialize());
@@ -136,6 +136,43 @@ app.get("/", async function (req, res) {
   yukle(res, req, "index.ejs");
 });
 
+/*
+app.get("/postt", async function(req, res) {
+  try {
+    let tag = req.query.tag; // URL'den gelen 'tag' parametresini al
+
+    // Veritabanındaki postları çek
+    let posts = db.get("post");
+
+    if (!posts) {
+      // Eğer postlar boşsa hata mesajı göster
+      console.error("Post verisi bulunamadı.");
+      return res.status(404).send("Post verisi bulunamadı.");
+    }
+
+    if (tag) {
+      // Eğer tag varsa, postları filtrele
+      posts = Object.fromEntries(
+        Object.entries(posts).filter(([key, post]) => post.tags && post.tags.includes(tag))
+      );
+    }
+
+    // Eğer hiç post yoksa uyarı ver
+    if (Object.keys(posts).length === 0) {
+      console.warn("Filtreleme sonucu hiçbir post bulunamadı.");
+      return res.status(404).send("Seçilen tag ile eşleşen post bulunamadı.");
+    }
+
+    // Filtrelenmiş veya tüm postları sayfaya yükle
+    yukle(res, req, "index.ejs", { posts });
+  } catch (error) {
+    // Hata durumunda logla ve kullanıcıya mesaj göster
+    console.error("Bir hata oluştu:", error);
+    res.status(500).send("Sunucu hatası oluştu.");
+  }
+});
+*/
+
 app.get("/portfolio", (req, res) => {
   yukle(res, req, "portfolio.ejs");
 });
@@ -146,7 +183,7 @@ app.get("/dino", (req, res) => {
 
 app.get("/test", (req, res) => {
   hh("/test domain sayfasına girildi.");
-  yukle(res, req, "test.ejs");
+  yukle(res, req, "index2.ejs");
 });
 
 app.post("/test", (req, res) => {
@@ -241,7 +278,12 @@ app.post("/postyayinla", async function (req, res) {
     sarki_isim = ayar["selectedTrackName"],
     sarki_sanatcilar = ayar["selectedTrackArtists"],
     sarki_prev = ayar["selectedTrackPrev"],
-    archived = ayar["archived"] ? true : false;
+    archived = ayar["archived"] ? true : false,
+    anaDil = ayar["mainLanguage"],
+    ekstraDil = ayar["extraLanguage"];
+
+  console.log("Ana Dil:", anaDil);
+  console.log("Ekstra Dil:", ekstraDil);
 
   console.log(req.body);
   if (!title && !aciklama)
@@ -255,6 +297,8 @@ app.post("/postyayinla", async function (req, res) {
       edited: false,
       likes: 0,
       archived: archived,
+      anaDil: anaDil,
+      ekstraDil: ekstraDil,
     });
   } else {
     db.set("post." + date2, {
@@ -271,6 +315,8 @@ app.post("/postyayinla", async function (req, res) {
         prev: sarki_prev,
       },
       archived: archived,
+      anaDil: anaDil,
+      ekstraDil: ekstraDil,
     });
   }
   if (archived === true) {
@@ -291,7 +337,26 @@ app.post("/postyayinla", async function (req, res) {
   );
   res.status(200).redirect("/postlar");
 });
+/*
+app.post('/translate', async (req, res) => {
+    try {
+        const { anaDil, ekstraDil, text } = req.body;
 
+        // Gelen verilerin doğruluğunu kontrol edin
+        if (!anaDil || !ekstraDil || !text) {
+            return res.status(400).json({ error: 'Eksik veya geçersiz veri gönderildi.' });
+        }
+
+        
+
+        // Başarılı yanıtı döndür
+        res.status(200).json("burası çalışmıyor");
+    } catch (error) {
+        console.error('Çeviri isteği sırasında hata oluştu:', error);
+        res.status(500).json({ error: 'Çeviri isteği sırasında bir hata oluştu.' });
+    }
+});
+*/
 app.get("/postlar", async function (req, res) {
   if (checkAuth(req, res)) {
     yukle(res, req, "admin-postlar.ejs");
@@ -347,7 +412,7 @@ let startTime = Date.now(); // Backend tarafında başlangıç zamanı
 function küfürListesiniYenile() {
   küfürler = JSON.parse(fs.readFileSync("./extras/küfürler.json", "utf8"));
   startTime = Date.now(); // Yenileme anında zaman güncelle
-  hh(messages.zeroai.badwords_protect_update)
+  hh(messages.zeroai.badwords_protect_update);
 }
 
 // Her 5 dakikada bir küfür listesini yenile
@@ -595,7 +660,7 @@ app.post("/api/keygen", async function (req, res) {
       key: apiKey,
     });
 
-    hh(messages.success.api_key_create.replace("{apiKey}", apiKey));
+    hh(messages.success.api_key_create.replace("{apiKey}", apiKey).replace("{sure}", parseInt(ayar.expiry)));
     // Anahtar başarıyla oluşturulduğunda istemciye yanıt gönder
     res.status(200).redirect("/api/keyliste");
   } catch (error) {
