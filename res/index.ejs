@@ -1,95 +1,93 @@
+<!DOCTYPE html>
 <%- include('header.ejs') %>
-<div class="container mt-5">
-  <section class="articles">
-    <div class="columns is-multiline">
-      <% let posts = db.get("post"); %>
-      <% if (posts) { %>
-        <% Object.keys(posts).forEach(key => { %>
-          <% let post = db.get("post." + key); %>
-          <% if (!post.archived) { %> <!-- Arşivlenmemiş postları göster -->
-            <div class="column is-one-third">
-              <div class="card article modern-card">
-                <div class="card-image">
-                  <% if (post.image) { %>
-                    <figure class="image is-4by3">
-                      <img src="<%= post.image %>" alt="<%= post.title %>">
-                    </figure>
-                  <% } %>
-                </div>
-                <div class="card-content">
-                  <div class="media">
-                    <div class="media-content">
-                      <p class="title article-title"><a href="/post/<%= key %>"><%= post.title %></a></p>
-                      <div class="tags has-addons level-item">
-                        <span class="tag is-rounded is-info"><i class="fas fa-user"></i> <%= post.author %></span>
-                        <span class="tag is-rounded"><i class="far fa-calendar-alt"></i> <%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
-                      </div>
-                      <div class="content article-body">
-                        <p><%= post.desc.length > 50 ? post.desc.substring(0, 50) + '...' : post.desc %></p>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Popüler Konular</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+  <style>
+    .modern-card {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease-in-out;
+    }
+
+    .modern-card:hover {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .article-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .article-body {
+      margin-bottom: 10px;
+    }
+
+    .article-body p {
+      font-size: 0.9em;
+    }
+  </style>
+<body>
+  <section class="section">
+    <div class="container">
+      <!-- <h1 class="title">Popüler Konular</h1> -->
+      <div class="columns is-multiline">
+        <% let posts = db.get("post") %> 
+        <% if (posts && Object.keys(posts).length > 0) { %> 
+          <% Object.keys(posts).forEach(key => { %>
+            <% let post = db.get("post." + key); %>
+            <% if (post && !post.archived) { %> 
+              <div class="column is-one-third">
+                <div class="card article modern-card">
+                  <div class="card-image">
+                    <% if (post.image) { %>
+                      <figure class="image is-4by3">
+                        <img src="<%= post.image %>" alt="<%= post.title %>">
+                      </figure>
+                    <% } %>
+                  </div>
+                  <div class="card-content">
+                    <div class="media">
+                      <div class="media-content">
+                        <p class="title article-title is-4"><%= post.title %></a></p>
+                        <div class="tags has-addons level-item">
+                          <span class="tag is-rounded is-info is-light"><i class="fas fa-user"></i> <%= post.author %></span>
+                          <span class="tag is-rounded is-light"><i class="far fa-calendar-alt"></i> <%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+                        </div>
+                        <div class="content article-body">
+                          <p><%= post.desc.length > 50 ? post.desc.substring(0, 50) + '...' : post.desc %></p>
+                        </div>
+                        <div class="has-text-right mt-3">
+                          <a href="/post/<%= key %>" class="button is-small is-primary is-outlined">Devamını Oku</a>
+                        </div>
+                        <div class="level is-mobile mt-3">
+                          <div class="level-left">
+                            <a class="level-item">
+                              <span class="icon is-small"><i class="fas fa-heart"></i></span>
+                              <span><%= post.likes || 0 %></span>
+                            </a>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          <% } %> <!-- Arşivlenmiş postlar bu if bloğunun dışında kalır -->
-        <% }); %>
-      <% } %>
+            <% } %>
+          <% }); %>
+        <% } else { %>
+          <p>Hiç post bulunamadı.</p> 
+        <% } %>
+      </div>
     </div>
   </section>
-</div>
-<%- include('footer.ejs') %>
-
-<style>
-  /* Genel stil */
-  body {
-    background-color: #f5f5f5;
-    color: #4a4a4a;
-    font-family: 'Roboto', sans-serif;
-  }
-
-  /* Modern kart stili */
-  .modern-card {
-    border: none;
-    border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .modern-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-  }
-
-  .modern-card .card-image img {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-  }
-
-  .article-title a {
-    color: #333;
-    text-decoration: none;
-    transition: color 0.3s;
-  }
-
-  .article-title a:hover {
-    color: #3273dc;
-  }
-
-  .tags .tag {
-    background-color: #3273dc;
-    color: #fff;
-    border-radius: 20px;
-    padding: 5px 10px;
-  }
-
-  .tags .tag.is-info {
-    background-color: #209cee;
-  }
-
-  .article-body {
-    font-size: 14px;
-    line-height: 1.6;
-  }
-</style>
+</body>
+</html>
+                      <%- include('footer.ejs') %>
