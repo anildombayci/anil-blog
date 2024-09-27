@@ -257,6 +257,46 @@
             </div>
         </div>
       <br>
+      <!--
+<div class="field is-horizontal">
+    <div class="field-label is-normal">
+        <label class="label">Dil Seçimi</label>
+    </div>
+    <div class="field-body">
+        <div class="field is-expanded">
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="control">
+                        <label class="label">Ana Dil Seçimi</label>
+                        <label class="radio">
+                            <input type="radio" id="mainLanguageTurkish" name="mainLanguage" value="turkish" disabled>
+                            Türkçe
+                        </label>
+                        <label class="radio">
+                            <input type="radio" id="mainLanguageEnglish" name="mainLanguage" value="english" disabled>
+                            İngilizce
+                        </label>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="control">
+                        <label class="label">Ekstra Dil Seçimi</label>
+                        <label class="radio">
+                            <input type="radio" id="extraLanguageTurkish" name="extraLanguage" value="turkish" disabled>
+                            Türkçe
+                        </label>
+                        <label class="radio">
+                            <input type="radio" id="extraLanguageEnglish" name="extraLanguage" value="english" disabled>
+                            İngilizce
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+      <br>
         <!-- Arşivli olarak paylaş checkbox -->
         <div class="field is-horizontal">
             <div class="field-label is-normal">
@@ -353,29 +393,6 @@
         document.getElementById('selectedTrackArtists').value = artists;
         document.getElementById('selectedTrackPrev').value = prev;
     }
-</script>
-<script>
-let btn = document.getElementById('btn');
-btn.addEventListener("click", function(){
-let pb = document.getElementById('baslik').value;
-let pa = document.getElementById('aciklama').value;
-if (pb && pa){
-  swal({
-  title: "Başarılı!",
-  text: "Post Başarıyla Yayınlandı!",
-  icon: "success",
-  button: "Tamam",
-});
-}else{
-  swal({
-  title: "Hata!",
-  text: "Biryeri eksik girmişsiniz lütfen tamamlayınız.",
-  icon: "error",
-  button: "Tamam",
-}); 
-}
-
-})
 </script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
