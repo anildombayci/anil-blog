@@ -1,93 +1,132 @@
 <%- include('header.ejs') %>
-<% var selectedTag = "Kategori seç"; %>
-<div class="container">
-<section class="articles">
-  <div class="columns is-multiline" id="articles">
-    <% let posts = db.get("post"); %>
-    <% if (posts) { %>
-      <% Object.keys(posts).forEach(key => { %>
-        <% let post = db.get("post." + key)[0]; %>
-        <% if (selectedTag === "Kategori seç" || post.tag === selectedTag) { %>
-        <div class="column is-one-third">
-          <div class="card article">
-            <div class="card-content">
-              <div class="media">
-                <div class="media-left">
+<div class="container mt-5">
+  <!-- Postları Gösterme -->
+  <section class="articles">
+    <div class="columns is-multiline">
+      <% let posts = db.get("post") %> <!-- Veriyi doğru şekilde alıyoruz -->
+      <% if (posts && Object.keys(posts).length > 0) { %> <!-- Boş post kontrolü -->
+        <% Object.keys(posts).forEach(key => { %>
+          <% let post = db.get("post." + key); %>
+          <% if (post && !post.archived) { %> <!-- Arşivlenmemiş postları göster -->
+            <div class="column is-one-third">
+              <div class="card article modern-card">
+                <div class="card-image">
+                  <% if (post.image) { %>
+                    <figure class="image is-4by3">
+                      <img src="<%= post.image %>" alt="<%= post.title %>">
+                    </figure>
+                  <% } %>
                 </div>
-                <div class="media-content">
-                  <p class="title article-title"><a style="color:black" href="/post/<%= key %>"><%= post.title %></a></p>
-                  <div class="tags has-addons level-item">
-                    <span class="tag is-rounded is-info"><i class="fas fa-user"></i>- <%= post.author %></span>
-                    <span class="tag is-rounded"><%= post.date %> - <i class="far fa-calendar-alt"></i></span>
-                    <span class="tag is-rounded is-warning"><%= post.tag %></span>
-                  </div>
-                  <div class="content article-body">
-                    <% if (post.desc.length > 15) { %>
-                      <p><%= post.desc.substring(0, 15) %>...</p>
-                    <% } else { %>
-                      <p><%= post.desc %></p>
-                    <% } %>
+                <div class="card-content">
+                  <div class="media">
+                    <div class="media-content">
+                      <p class="title article-title"><a href="/post/<%= key %>"><%= post.title %></a></p>
+                      <div class="tags has-addons level-item">
+                        <span class="tag is-rounded is-info"><i class="fas fa-user"></i> <%= post.author %></span>
+                        <span class="tag is-rounded"><i class="far fa-calendar-alt"></i> <%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' }) %></span>
+                      </div>
+                      <div class="content article-body">
+                        <p><%= post.desc.length > 50 ? post.desc.substring(0, 50) + '...' : post.desc %></p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <% } %>
-      <% }); %>
-    <% } %>
-  </div>
-</section>
-</div>
-<br>
-<br>
-<br>
-<div class="container">
-  <div class="columns is-centered">
-    <div class="column is-half has-text-centered">
-      <div class="dropdown is-hoverable is-right">
-        <div class="dropdown-trigger">
-          <div id="dropdown-menu" class="select is-rounded">
-            <select class="is-hovered" onchange="filterByTag(this.value)">
-              <option value="Kategori seç">Kategori seç</option>
-              <option value="laflar">laflar</option>
-              <option value="gerçekler">gerçekler</option>
-              <option value="bilgilendirme">bilgilendirme</option>
-            </select>
-          </div>
-        </div>
+          <% } %>
+        <% }); %>
+      <% } else { %>
+        <p>Hiç post bulunamadı.</p> <!-- Postlar yoksa bilgilendirme mesajı -->
+      <% } %>
+    </div>
+  </section>
+<!--
+  <div class="field mt-5">
+    <label class="label">Tag'e Göre Filtrele</label>
+    <div class="control has-icons-left">
+      <div class="select is-rounded is-small">
+        <select id="tagFilter" onchange="filterByTag()">
+          <option value="">Tüm Tag'ler</option>
+          <% const allTags = []; %>
+          <% Object.keys(posts).forEach(key => { %>
+            <% let post = posts[key]; %>
+            <% if (post.tags) { %>
+              <% post.tags.forEach(tag => { if (!allTags.includes(tag)) allTags.push(tag); }); %>
+            <% } %>
+          <% }); %>
+          <% allTags.forEach(tag => { %>
+            <option value="<%= tag %>"><%= tag %></option>
+          <% }); %>
+        </select>
       </div>
+      <span class="icon is-small is-left">
+        <i class="fas fa-filter"></i>
+      </span>
     </div>
   </div>
 </div>
+-->
 <%- include('footer.ejs') %>
+  
+<!--
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Dropdown menüsünü seç
-    var dropdown = document.querySelector('.is-hoverable select');
-
-    // Seçili kategoriyi yerel depolamadan al ve dropdown menüsünde seçili olarak belirle
-    var selectedTag = localStorage.getItem("selectedTag") || "Kategori seç";
-    dropdown.value = selectedTag;
-    
-    // Dropdown menüsündeki seçim değiştikçe tetiklenecek fonksiyonu ekle
-    dropdown.addEventListener('change', function(event) {
-      // Seçilen seçeneği al
-      var selectedOption = event.target.value;
-
-      // Seçilen seçeneği yerel depolamaya kaydet
-      localStorage.setItem("selectedTag", selectedOption);
-
-      // Seçilen seçeneği konsola yazdır (örneğin, test amaçlı)
-      console.log('Seçilen seçenek:', selectedOption);
-    });
-  });
-
-  function filterByTag(tag) {
-    // Seçilen kategoriyi yerel depolamaya kaydet
-    localStorage.setItem("selectedTag", tag);
-    
-    // Yeniden yükleme yap
-    location.reload();
-  }
+ // Tag'e göre filtreleme fonksiyonu
+  function filterByTag() {
+    var tag = document.getElementById('tagFilter').value;
+    window.location.href = '/postt' + (tag ? '?tag=' + tag : '');
+  }  
 </script>
+-->
+<style>
+  /* Genel stil */
+  body {
+    background-color: #f5f5f5;
+    color: #4a4a4a;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  /* Modern kart stili */
+  .modern-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .modern-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  .modern-card .card-image img {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+
+  .article-title a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .article-title a:hover {
+    color: #3273dc;
+  }
+
+  .tags .tag {
+    background-color: #3273dc;
+    color: #fff;
+    border-radius: 20px;
+    padding: 5px 10px;
+  }
+
+  .tags .tag.is-info {
+    background-color: #209cee;
+  }
+
+  .article-body {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+</style>
