@@ -15,7 +15,6 @@ let express = require("express"),
   }),
   ayarlar = {
     port: 3000,
-    spotifyToken: "",
   },
   path = require("path"),
   passport = require("passport"),
@@ -384,9 +383,7 @@ app.post("/postlar/:id/yorumlar", async function (req, res) {
   veri2 = veri.filter((x) => x.date !== tarih); // Tarihi sayıya çevirdik;
   db.set(`post.${id}.comments`, veri2);
   hh(
-    messages.post_comment_deleted
-      .replace("{id}", id)
-      .replace("{date}", req.body.date)
+    messages.post_comment_deleted.replace("{id}", id).replace("{date}", req.body.date)
   );
   res.status(200).send(true);
 });
@@ -416,28 +413,47 @@ function küfürListesiniYenile() {
 }
 
 // Her 5 dakikada bir küfür listesini yenile
-setInterval(küfürListesiniYenile, 300000); // 300000 milisaniye = 5 dakika
+setInterval(küfürListesiniYenile, 600000); // 300000 milisaniye = 5 dakika
 
 app.get("/api/start-time", (req, res) => {
   res.json({ startTime: startTime });
 });
 
+const Sentiment = require("sentiment");
+const sentiment = new Sentiment();
+
+const küfürlerr = küfürler.map((word) => new RegExp(`\\b${word}\\b`, "i"));
+
 function yorumK(y) {
-  let words = y.toLowerCase().split(/\s+/);
-  for (let i = 0; i < words.length; i++) {
-    if (küfürler.includes(words[i])) {
-      return true;
+  let sentimentScore = sentiment.analyze(y).score; // Sentiment analizini uyguluyor
+  if (sentimentScore < -2) return true; // Çok negatif ise direkt engelle
+
+  for (let regex of küfürlerr) {
+    if (regex.test(y)) {
+      return true; // Küfür içeren bir kelime bulundu
     }
   }
   return false;
 }
 
+app.post("/api/zerobot/ogret", (req, res) => {
+  const { comment } = req.body;
+
+  küfürler.push(comment);
+
+  fs.writeFileSync("./extras/küfürler.json", JSON.stringify(küfürler));
+
+  hh(messages.zeroai.new_badword_learned.replace("{badword}", comment));
+  res.send("Yorum başarıyla öğretildi.");
+});
+
 app.post("/post/:id/comment", (req, res) => {
   let id = req.params.id;
   let ayar = req.body;
+
   if (ayar.name !== "Anıl" && yorumK(ayar.comment)) {
     res.send(
-      "Yorumunuzda küfür tespit edilmiştir. Toplum kurallarına uyarak yorum paylaşmanızı şiddetle tavsiye ediyorum."
+      "Yorumunuzda küfür veya uygunsuz içerik tespit edilmiştir. Toplum kurallarına uyarak yorum paylaşmanızı tavsiye ediyorum."
     );
     hh(messages.zeroai.comment_badwords_found.replace("{id}", id));
     db.add("ek", +1);
@@ -660,7 +676,11 @@ app.post("/api/keygen", async function (req, res) {
       key: apiKey,
     });
 
-    hh(messages.success.api_key_create.replace("{apiKey}", apiKey).replace("{sure}", parseInt(ayar.expiry)));
+    hh(
+      messages.success.api_key_create
+        .replace("{apiKey}", apiKey)
+        .replace("{sure}", parseInt(ayar.expiry))
+    );
     // Anahtar başarıyla oluşturulduğunda istemciye yanıt gönder
     res.status(200).redirect("/api/keyliste");
   } catch (error) {
