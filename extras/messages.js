@@ -30,14 +30,15 @@ let messages = {
       post_deleted: `[BLOG] - "{postId}" Post Kaldırıldı`,
       link_added: `[LINK] - Link sistemine yeni link eklendi! {url1}`,
       link_deleted: `[LINK] - Link sisteminden "{ayar}" anahtarlı link kaldırıldı!`,
-      api_key_create: `[API] - "{apiKey}" Anahtar Oluşturuldu.`,
+      api_key_create: `[API] - "{apiKey}" Anahtar Oluşturuldu. Bu anahtarın geçerliliği "{sure} gün" sonra bitecektir.`,
       api_key_delete: `[API] - "{apiKey}" Anahtar Kaldırıldı.`,
       authorized_key_used: `[API-SISTEM] - "/api/postveri" sistemi başarıyla tam yetkili bir anahtar ile kullanıldı! "{key}"`,
       api_key_used: `[API-SISTEM] - "/api/link/:id" sistemi Başarıyla veri çekildi! API Key: "{key}"`
     },
     zeroai: {
       comment_badwords_found: `[BLOG-POST-ZEROAI] - "{id}" id'li post'a küfürlü yorum paylaşıldı. Ve ZeroBOT tarafından engellendi.`,
-      badwords_protect_update: `[ZEROAI-SYSTEM-BOOT] - ZeroBOT Küfür koruma sistemi güncellendi. Ve aktif edildi!`
+      badwords_protect_update: `[ZEROAI-SYSTEM-BOOT] - ZeroBOT Küfür koruma sistemi güncellendi. Ve aktif edildi!`,
+      new_badword_learned: `[ZEROAI] - Yeni bir kötü kelime öğrendi. "{badword}"`
     },
     link_used_wrong: `[LINK] - Link sistemi hatalı kullanıldı.`,
     link_used: `[LINK] - Link sistemi kullanıldı! {ayar}`,
