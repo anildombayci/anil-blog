@@ -156,7 +156,7 @@
     </nav>
   </div>  
   <div class="notification is-info is-light">
-    Bu sayfada <strong>senin paylaştığın</strong> yazıtlar mevcuttur bunları incelemek kaldırmak isterseniz lütfen <strong>post kimliğini</strong> kopyalayıp gerekli işlemi yapmak istediğinizde admin panelinden gerekli sayfalara geçiniz. Veyahut <strong> yandaki butonları </strong> kullanınız
+    Bu sayfada <strong>paylaştığınız yazıta gelen yorumlar mevcuttur</strong> burada uygulayabileceğiniz fonksiyonlar <strong>Yorumu Kaldırma</strong> ve <strong>ZeroBOT'a Öğret</strong> butonudur öğretme butonu ZeroBOT'a görünmeyen kötü yorumu öğreterek bir daha onun gibi bir kötü yorumlar gelirse engellemesini sağlayabilirsiniz
   </div>
 <div>
   <% if (db.get("post." + id + ".comments") && db.get("post." + id + ".comments").length > 0) { %>
@@ -164,19 +164,26 @@
       <thead>
         <th><abbr title="Kimliği">Yorum Sahibi</abbr></th>
         <th><abbr title="Başlık">Yorum İçeriği</abbr></th>
-        <th><abbr title="Başlık">Yorum Tarihi</abbr></th>
+        <th><abbr title="Tarih">Yorum Tarihi</abbr></th>
       </thead>
       <tbody>
         <% let postlar = db.get("post." + id + ".comments") %>
         <% postlar.forEach(post => { %>
           <tr>
-            <td><%= post.name %></td>
+            <td><%= post.name.replace("ZBT", "Zero BOT") %></td>
             <td><%= post.comment %></td>
             <td><%= new Date(post.date).toLocaleString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' , hour: 'numeric', minute: 'numeric' }) %></td>
             <td>
               <button class="button is-danger is-light is-small" onclick="kaldır(`<%= id %>`, `<%= post.date %>`)"> <!-- Kaldır butonu -->
                 <span class="icon">
                   <i class="fas fa-trash-alt"></i>
+                </span>
+              </button>
+            </td>
+            <td>
+              <button class="button is-warning is-light is-small" onclick="ogret(`<%= post.comment %>`)">
+                <span class="icon">
+                  <i class="fas fa-graduation-cap"></i>
                 </span>
               </button>
             </td>
@@ -204,6 +211,17 @@ function kaldır(postID, date) {
       console.error('Post kaldırılamadı:', error); // Hata durumunda konsola hata yazdır
     });
 }
+function ogret(comment) {
+  axios.post('/api/zerobot/ogret', { comment: comment })
+    .then(function(response) {
+      alert("Başarılı! Kötü kelime başarıyla ZeroBOT'a öğretildi!");
+    })
+    .catch(function(error) {
+      console.error('Yorum öğretilemedi:', error);
+      alert("Başarısız. Öğretme başarısız lütfen konsolu kontrol ediniz.");
+    });
+}
+
 </script>
 </body>
 <script>
