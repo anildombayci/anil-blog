@@ -329,35 +329,35 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    const intervalDuration = 300; // 120 saniye (2 dakika)
+const intervalDuration = 600; // 600 saniye (10 dakika)
 
-    function startTimer(startTime) {
-        const intervalDurationInMillis = intervalDuration * 1000;
+function startTimer(startTime) {
+    const intervalDurationInMillis = intervalDuration * 1000;
 
-        function updateTimer() {
-            const currentTime = Date.now();
-            let elapsed = Math.floor((currentTime - startTime) / 1000);
-            let remainingTime = intervalDuration - (elapsed % intervalDuration);
+    function updateTimer() {
+        const currentTime = Date.now();
+        let elapsed = Math.floor((currentTime - startTime) / 1000);
+        let remainingTime = intervalDuration - (elapsed % intervalDuration);
 
-            const minutes = Math.floor(remainingTime / 60);
-            const seconds = remainingTime % 60;
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
 
-            document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-        }
-
-        updateTimer(); // Timer'ı hemen güncelle
-        setInterval(updateTimer, 1000); // Her saniyede bir timer güncellenir
+        document.getElementById('timer').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
 
-    // Backend'den başlangıç zamanını al
-    axios.get('/api/start-time')
-        .then(response => {
-            const startTime = response.data.startTime;
-            startTimer(startTime);
-        })
-        .catch(error => {
-            console.error('Başlangıç zamanı alınamadı:', error);
-        });
+    updateTimer(); // Timer'ı hemen güncelle
+    setInterval(updateTimer, 1000); // Her saniyede bir timer güncellenir
+}
+
+// Backend'den başlangıç zamanını al
+axios.get('/api/start-time')
+    .then(response => {
+        const startTime = response.data.startTime;
+        startTimer(startTime);
+    })
+    .catch(error => {
+        console.error('Başlangıç zamanı alınamadı:', error);
+    });
 </script>
 <script>
 function temizle() {
